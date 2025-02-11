@@ -1,0 +1,90 @@
+/* Container */
+.container {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5; /* สีพื้นหลัง */
+    padding: 20px;
+  }
+  
+  /* Header */
+  .header {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333333; /* สีข้อความหัวข้อ */
+    margin-bottom: 20px;
+  }
+  
+  /* Form Section */
+  .form-container {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form-container h3 {
+    color: #555;
+    margin-bottom: 15px;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .submit-button {
+    background-color: #007bff !important;
+    color: white !important;
+    font-weight: bold;
+    border-radius: 5px;
+    margin-top: 10px;
+  }
+  
+  /* Table Section */
+  .table-container {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .table-header {
+    background-color: #007bff; /* สีหัวตาราง */
+  }
+  
+  .table-header th {
+    color: white !important;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .MuiTableCell-root {
+    text-align: center;
+  }
+  
+  .profile-img {
+    border-radius: 50%; /* ให้รูปโปรไฟล์เป็นวงกลม */
+    object-fit: cover;
+  }
+  
+  /* Action Buttons */
+  .action-button {
+    margin-right: 5px;
+    color: white !important;
+  }
+  
+  .action-button:first-child {
+    background-color: #4caf50 !important; /* สีเขียวสำหรับ Edit */
+  }
+  
+  .action-button:last-child {
+    background-color: #f44336 !important; /* สีแดงสำหรับ Delete */
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .table-container {
+      overflow-x: auto;
+    }
+  }
+  
