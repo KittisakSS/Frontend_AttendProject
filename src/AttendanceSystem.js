@@ -10,6 +10,9 @@ import {
   Box,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import Avatar from "@mui/material/Avatar";
+import logo from "../src/img/logo.png"
+import Swal from "sweetalert2";
 
 const Root = styled("div")(({ theme }) => ({
   backgroundColor: "#fdf3e3",
@@ -42,7 +45,7 @@ const Clock = styled(Box)(({ theme }) => ({
 const Footer = styled("footer")(({ theme }) => ({
   padding: theme.spacing(2),
   textAlign: "center",
-  marginTop: theme.spacing(4),
+  marginTop: theme.spacing(26),
   backgroundColor: "#fafafa",
   color: "#555",
 }));
@@ -80,6 +83,7 @@ const AttendanceSystem = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("password"); // ✅ ลบรหัสผ่านออก
     window.location = "/login";
   };
 
@@ -97,78 +101,152 @@ const AttendanceSystem = () => {
   }, []);
 
   const handleCheckIn = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-
-        fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            const locationIn = data.display_name;
-
-            fetch("http://localhost:3333/checkin", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                tec_id: userData.tec_id,
-                tec_name: userData.tec_name,
-                location_in: locationIn,
-              }),
-            })
-              .then((res) => res.json())
-              .then((data) => alert(data.message));
-          })
-          .catch((err) => console.error("Error fetching location data:", err));
+      const savedPassword = localStorage.getItem("password");
+    
+      Swal.fire({
+        title: "ยืนยันการลงเวลาเข้า",
+        input: "password",
+        inputPlaceholder: "กรอกรหัสผ่าน...",
+        showCancelButton: true,
+        confirmButtonText: "ตกลง",
+        cancelButtonText: "ยกเลิก",
+        inputAttributes: {
+          autocapitalize: "off",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const enteredPassword = result.value;
+    
+          if (enteredPassword !== savedPassword) {
+            Swal.fire("ผิดพลาด!", "รหัสผ่านไม่ถูกต้อง", "error");
+            return;
+          }
+    
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+              const { latitude, longitude } = position.coords;
+    
+              fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              )
+                .then((res) => res.json())
+                .then((data) => {
+                  const locationIn = data.display_name;
+    
+                  fetch("http://localhost:3333/checkin", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      tec_id: userData.tec_id,
+                      tec_name: userData.tec_name,
+                      location_in: locationIn,
+                    }),
+                  })
+                    .then((res) => res.json())
+                    .then((data) => {
+                      if (data.status === "ok") {
+                        Swal.fire("สำเร็จ!", "ลงเวลาเข้าทำงานเรียบร้อย", "success");
+                      } else {
+                        Swal.fire("ผิดพลาด!", "Error: " + data.message, "error");
+                      }
+                    })
+                    .catch((err) => {
+                      console.error("Fetch error:", err);
+                      Swal.fire(
+                        "ผิดพลาด!",
+                        "ไม่สามารถลงเวลาเข้าได้ โปรดลองอีกครั้ง",
+                        "error"
+                      );
+                    });
+                })
+                .catch((err) =>
+                  console.error("Error fetching location data:", err)
+                );
+            });
+          } else {
+            Swal.fire("ผิดพลาด!", "เบราว์เซอร์ของคุณไม่รองรับ Geolocation", "error");
+          }
+        }
       });
-    }
-  };
-
-  const handleCheckOut = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-
-        fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            const locationOut = data.display_name;
-
-            fetch("http://localhost:3333/checkout", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                tec_id: userData.tec_id,
-                location_out: locationOut,
-              }),
-            })
-              .then((res) => res.json())
-              .then((data) => {
-                if (data.status === "ok") {
-                  alert("ลงเวลาออกงานสำเร็จ!");
-                } else {
-                  alert("Error: " + data.message);
-                }
-              })
-              .catch((err) => {
-                console.error("Fetch error:", err);
-                alert("ไม่สามารถลงเวลาออกงานได้ โปรดลองอีกครั้ง");
-              });
-          })
-          .catch((err) => console.error("Error fetching location data:", err));
+    };
+  
+    const handleCheckOut = () => {
+      const savedPassword = localStorage.getItem("password");
+    
+      Swal.fire({
+        title: "ยืนยันการลงเวลาออก",
+        input: "password",
+        inputPlaceholder: "กรอกรหัสผ่าน...",
+        showCancelButton: true,
+        confirmButtonText: "ตกลง",
+        cancelButtonText: "ยกเลิก",
+        inputAttributes: {
+          autocapitalize: "off",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const enteredPassword = result.value;
+    
+          if (enteredPassword !== savedPassword) {
+            Swal.fire("ผิดพลาด!", "รหัสผ่านไม่ถูกต้อง", "error");
+            return;
+          }
+    
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+              const { latitude, longitude } = position.coords;
+    
+              fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              )
+                .then((res) => res.json())
+                .then((data) => {
+                  const locationOut = data.display_name;
+    
+                  fetch("http://localhost:3333/checkout", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      tec_id: userData.tec_id,
+                      location_out: locationOut,
+                    }),
+                  })
+                    .then((res) => res.json())
+                    .then((data) => {
+                      if (data.status === "ok") {
+                        Swal.fire("สำเร็จ!", "ลงเวลาออกงานเรียบร้อย", "success");
+                      } else {
+                        Swal.fire("ผิดพลาด!", "Error: " + data.message, "error");
+                      }
+                    })
+                    .catch((err) => {
+                      console.error("Fetch error:", err);
+                      Swal.fire(
+                        "ผิดพลาด!",
+                        "ไม่สามารถลงเวลาออกงานได้ โปรดลองอีกครั้ง",
+                        "error"
+                      );
+                    });
+                })
+                .catch((err) =>
+                  console.error("Error fetching location data:", err)
+                );
+            });
+          } else {
+            Swal.fire("ผิดพลาด!", "เบราว์เซอร์ของคุณไม่รองรับ Geolocation", "error");
+          }
+        }
       });
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  };
+    };
 
   return (
     <Root>
       <Header position="static">
         <Toolbar>
+        <Avatar 
+       src={logo} 
+       sx={{ width: 70, height: 70, marginRight: 2 }} 
+      alt="Logo"/>
           <Typography variant="h5" color="black" fontWeight="bold">
             ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราษฎร์ศรัทธาธรรม
           </Typography>
@@ -281,20 +359,21 @@ const AttendanceSystem = () => {
             <Button
               variant="outlined"
               color="inherit"
+              mr={5}
               sx={{ fontWeight: "bold", px: 2 }}
-              onClick={() => handleNavigation("/leaverecords")}
+              onClick={() => handleNavigation("/leavedirect")}
             >
               ดูรายการลา
             </Button>
           </Grid>
         </Grid>
-
-        <Footer>
+      </Container>
+      
+      <Footer>
           <Typography variant="body2">
             © {new Date().getFullYear()} โรงเรียนวัดราษฎร์ศรัทธาธรรม
           </Typography>
         </Footer>
-      </Container>
     </Root>
   );
 };

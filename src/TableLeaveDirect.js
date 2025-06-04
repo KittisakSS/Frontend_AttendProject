@@ -20,7 +20,7 @@ import { styled } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import logo from "../src/img/logo.png";
 
-const TableLeaveRecords = () => {
+const TableLeaveDirect = () => {
   const [leaveData, setLeaveData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
@@ -94,30 +94,6 @@ const TableLeaveRecords = () => {
       })
       .catch((err) => console.error("Error fetching leave records: ", err));
   }, []);
-
-  const updateApprovalStatus = async (leave_id, newStatus) => {
-    try {
-      const response = await fetch(`http://localhost:3333/updateApproval`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ leave_id, approval_status: newStatus }),
-      });
-      const result = await response.json();
-      if (result.status === "ok") {
-        setLeaveData((prevData) =>
-          prevData.map((row) =>
-            row.leave_id === leave_id
-              ? { ...row, approval_status: newStatus }
-              : row
-          )
-        );
-      }
-    } catch (error) {
-      console.error("Error updating approval status:", error);
-    }
-  };
 
   const convertToDateRange = (dateString) => {
     if (!dateString || typeof dateString !== "string") return "";
@@ -244,13 +220,10 @@ const TableLeaveRecords = () => {
           <Button variant="contained" color="secondary" onClick={resetFilters}>
             รีเซ็ต
           </Button>
-          <Button variant="contained" color="error" sx={{ fontWeight: "bold" }} onClick={() => (window.location = "/director")}>
+          <Button variant="contained" color="error" sx={{ fontWeight: "bold" }} onClick={() => (window.location = "/users")}>
                     ย้อนกลับ
                   </Button>
         </FilterContainer>
-        <Typography variant="h6" align="center" sx={{ fontWeight: "bold", mt: 2 }}>
-  จำนวนการลาทั้งหมด: {filteredRows.filter(row => row.approval_status === "อนุมัติการลา").length} ครั้ง
-</Typography>
         <TableContainer component={Paper} sx={{ mt: 2 }}>
           <Table>
             <TableHead>
@@ -300,11 +273,6 @@ const TableLeaveRecords = () => {
                 >
                   สถานะการอนุมัติ
                 </TableCell>
-                <TableCell
-                  sx={{ width: "120px", color: "#fff", fontWeight: "bold" }}
-                >
-                  เปลี่ยนสถานะ
-                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -321,22 +289,6 @@ const TableLeaveRecords = () => {
                   <TableCell>{row.phone}</TableCell>
                   <TableCell>{row.leave_status}</TableCell>
                   <TableCell>{row.approval_status}</TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() =>
-                        updateApprovalStatus(row.leave_id, "อนุมัติการลา")
-                      }
-                    >
-                      ✅
-                    </Button>
-                    <Button
-                      onClick={() =>
-                        updateApprovalStatus(row.leave_id, "ยังไม่อนุมัติการลา")
-                      }
-                    >
-                      ❌
-                    </Button>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -366,4 +318,4 @@ const TableLeaveRecords = () => {
   );
 };
 
-export default TableLeaveRecords;
+export default TableLeaveDirect;

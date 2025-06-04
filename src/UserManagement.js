@@ -15,6 +15,9 @@ import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import "./css/UserManagement.css";
 
+import logo from "../src/img/logo.png"
+import Swal from "sweetalert2";
+
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({
@@ -81,36 +84,59 @@ const UserManagement = () => {
   };
 
   const handleSubmit = () => {
-    const token = localStorage.getItem("token");
-    const url = editId
-      ? `http://localhost:3333/users/${editId}`
-      : "http://localhost:3333/register";
-    const method = editId ? "PUT" : "POST";
-
-    const formData = new FormData();
-    formData.append("tec_name", form.tec_name);
-    formData.append("email", form.email);
-    formData.append("role", form.role);
-    formData.append("position", form.position);
-    if (profileImage) {
-      formData.append("profileImage", profileImage);
-    }
-
-    fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${token}`,
+    Swal.fire({
+      title: "กรอกรหัสผ่านเพื่อยืนยัน",
+      input: "password",
+      inputPlaceholder: "กรอกรหัสผ่าน...",
+      showCancelButton: true,
+      confirmButtonText: "ตกลง",
+      cancelButtonText: "ยกเลิก",
+      inputAttributes: {
+        autocapitalize: "off",
       },
-      body: formData,
-    })
-      .then(() => {
-        fetchUsers();
-        setForm({ tec_name: "", email: "", role: "", position: "", t_profile: "" });
-        setEditId(null);
-        setProfileImage(null);
-      })
-      .catch(() => alert("Error updating user"));
-  };
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const enteredPassword = result.value;
+        const savedPassword = localStorage.getItem("password");
+  
+        if (enteredPassword !== savedPassword) {
+          Swal.fire("ผิดพลาด!", "รหัสผ่านไม่ถูกต้อง", "error");
+          return;
+        }
+  
+        const token = localStorage.getItem("token");
+        const url = editId
+          ? `http://localhost:3333/users/${editId}`
+          : "http://localhost:3333/register";
+        const method = editId ? "PUT" : "POST";
+  
+        const formData = new FormData();
+        formData.append("tec_name", form.tec_name);
+        formData.append("email", form.email);
+        formData.append("role", form.role);
+        formData.append("position", form.position);
+        if (profileImage) {
+          formData.append("profileImage", profileImage);
+        }
+  
+        fetch(url, {
+          method,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        })
+          .then(() => {
+            fetchUsers();
+            setForm({ tec_name: "", email: "", role: "", position: "", t_profile: "" });
+            setEditId(null);
+            setProfileImage(null);
+            Swal.fire("สำเร็จ!", "อัปเดตข้อมูลเรียบร้อย", "success");
+          })
+          .catch(() => Swal.fire("ผิดพลาด!", "Error updating user", "error"));
+      }
+    });
+  };  
 
   const handleEdit = (user) => {
     setEditId(user.tec_id);
@@ -147,7 +173,10 @@ const UserManagement = () => {
   return (
     <div className="container">
       <Grid item xs={12} sx={{ backgroundColor: "#a6dcef", display: "flex", alignItems: "center", padding: "16px 32px" }}>
-        <Avatar sx={{ bgcolor: "#fff", marginRight: 2 }}>LOGO</Avatar>
+      <Avatar 
+       src={logo} 
+       sx={{ width: 70, height: 70, marginRight: 2 }} 
+      alt="Logo"/>
         <Typography variant="h5" component="div" sx={{ fontWeight: "bold" }}>
           ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราชภัฏศรัทธาธรรม
         </Typography>

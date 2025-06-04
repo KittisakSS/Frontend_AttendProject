@@ -10,6 +10,8 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+import logo from "../src/img/logo.png"
+
 const theme = createTheme();
 
 export default function SignIn() {
@@ -31,12 +33,16 @@ export default function SignIn() {
         if (data.status === "ok") {
           alert("Login successful");
           localStorage.setItem("token", data.token);
+          localStorage.setItem("role", data.role);  // ✅ เพิ่มการเก็บ role ลงใน localStorage
+          localStorage.setItem("password", password);  // ✅ เก็บรหัสผ่าน
   
           // Check role and navigate
           if (data.role === "admin") {
             window.location = "/users";
           } else if (data.role === "user") {
             window.location = "/user";
+          } else if (data.role === "director") {
+            window.location = "/director";
           } else {
             alert("Invalid role");
           }
@@ -50,7 +56,7 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: '70vh' }}>
+      <Grid container component="main" sx={{ height: '60vh' }}>
         <CssBaseline />
         {/* Header Section */}
         <Grid
@@ -63,7 +69,7 @@ export default function SignIn() {
             padding: '16px 32px',
           }}
         >
-          <Avatar sx={{ bgcolor: '#fff', marginRight: 2 }}>LOGO</Avatar>
+          <Avatar src={logo} sx={{ width: 100, height: 100, marginRight: 2 }} alt="Logo"/>
           <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
             ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราชภัฏศรัทธาธรรม
           </Typography>
@@ -79,7 +85,7 @@ export default function SignIn() {
           >
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
               <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
-                Sign In
+                ลงชื่อเข้าใช้
               </Typography>
               <TextField
                 margin="normal"
@@ -108,7 +114,7 @@ export default function SignIn() {
                 onChange={(e) => setPassword(e.target.value)} // Update state when input changes
               />
               <Link href="#" variant="body2" sx={{ display: 'block', textAlign: 'right', mt: 1, mb: 3 }}>
-                Forgot your password?
+                ลืมรหัสผ่าน?
               </Link>
               <Grid container spacing={2}>
                 {/* <Grid item xs={6}>
@@ -139,7 +145,7 @@ export default function SignIn() {
                       },
                     }}
                   >
-                    Login
+                    เข้าสู่ระบบ
                   </Button>
                 </Grid>
               </Grid>
@@ -150,3 +156,4 @@ export default function SignIn() {
     </ThemeProvider>
   );
 }
+

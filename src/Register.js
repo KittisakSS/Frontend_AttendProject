@@ -1,33 +1,39 @@
-import * as React from 'react';
-import { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import CssBaseline from '@mui/material/CssBaseline';
-import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import * as React from "react";
+import { useState } from "react";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import Link from "@mui/material/Link";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Grid from "@mui/material/Grid";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+import logo from "../src/img/logo.png";
 
 const theme = createTheme();
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
-    tecName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: '',
-    position: '',
+    tecName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    role: "",
+    position: "",
     profileImage: null,
   });
 
-  const [error, setError] = useState('');
+  const handleBack = (event) => {
+    event.preventDefault();
+    window.location = "/usermanage";
+  };
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
-    if (type === 'file') {
+    if (type === "file") {
       setFormData({
         ...formData,
         [name]: files[0],
@@ -44,66 +50,77 @@ export default function SignUp() {
     event.preventDefault();
 
     // ตรวจสอบข้อมูลที่กรอกครบถ้วน
-    if (!formData.tecName || !formData.email || !formData.password || !formData.confirmPassword || !formData.role || !formData.position) {
-      setError('กรุณากรอกข้อมูลให้ครบทุกช่อง');
+    if (
+      !formData.tecName ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword ||
+      !formData.role ||
+      !formData.position
+    ) {
+      setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
       return;
     }
 
     // ตรวจสอบรหัสผ่านตรงกัน
     if (formData.password !== formData.confirmPassword) {
-      setError('รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน');
+      setError("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน");
       return;
     }
 
-    setError('');
+    setError("");
 
     // สร้าง FormData สำหรับการส่งข้อมูล
     const formDataToSend = new FormData();
-    formDataToSend.append('tec_name', formData.tecName);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('password', formData.password);
-    formDataToSend.append('role', formData.role);
-    formDataToSend.append('position', formData.position);
+    formDataToSend.append("tec_name", formData.tecName);
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("password", formData.password);
+    formDataToSend.append("role", formData.role);
+    formDataToSend.append("position", formData.position);
 
     if (formData.profileImage) {
-      formDataToSend.append('profileImage', formData.profileImage);
+      formDataToSend.append("profileImage", formData.profileImage);
     }
 
     try {
-      const response = await fetch('http://localhost:3333/register', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3333/register", {
+        method: "POST",
         body: formDataToSend,
       });
 
       const data = await response.json();
 
-      if (data.status === 'ok') {
-        alert('สมัครสมาชิกสำเร็จ');
-        window.location = '/login';
+      if (data.status === "ok") {
+        alert("สมัครสมาชิกสำเร็จ");
+        window.location = "/login";
       } else {
-        setError(data.message || 'เกิดข้อผิดพลาดในการสมัครสมาชิก');
+        setError(data.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
       }
     } catch (err) {
-      console.error('Error:', err);
-      setError('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์');
+      console.error("Error:", err);
+      setError("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
     }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: '100vh' }}>
+      <Grid container component="main" sx={{ height: "100vh" }}>
         <Grid
           item
           xs={12}
           sx={{
-            backgroundColor: '#a6dcef',
-            display: 'flex',
-            alignItems: 'center',
-            padding: '16px 32px',
+            backgroundColor: "#a6dcef",
+            display: "flex",
+            alignItems: "center",
+            padding: "16px 32px",
           }}
         >
-          <Avatar sx={{ bgcolor: '#fff', marginRight: 2 }}>LOGO</Avatar>
-          <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
+          <Avatar
+            src={logo}
+            sx={{ width: 70, height: 70, marginRight: 2 }}
+            alt="Logo"
+          />
+          <Typography variant="h5" component="div" sx={{ fontWeight: "bold" }}>
             ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราชภัฏศรัทธาธรรม
           </Typography>
         </Grid>
@@ -115,21 +132,26 @@ export default function SignUp() {
           md={5}
           component={Box}
           sx={{
-            margin: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            margin: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
             padding: 3,
             borderRadius: 2,
             boxShadow: 3,
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }} />
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }} />
           <Typography component="h1" variant="h5">
             Sign Up
           </Typography>
-          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit}
+            sx={{ mt: 3 }}
+          >
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
@@ -231,8 +253,21 @@ export default function SignUp() {
                 />
               </Grid>
             </Grid>
-            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
               Sign Up
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ mt: 3, mb: 2 }}
+              onClick={handleBack}
+            >
+              ย้อนกลับ
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>

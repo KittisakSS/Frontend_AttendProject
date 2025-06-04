@@ -13,6 +13,9 @@ import LeaveSystem from './LeaveSystem.js';
 import AttenSystemUser from './AttenSystemUser.js';
 import TableAttendanceUser from './TableAttenUser.js';
 import TableLeaveRecords from './TableLeaveRecords.js';
+import TableLeaveUser from './TableLeaveUser.js';
+import AttendSystemDirect from './AttendSystemDirect.js';
+import TableLeaveDirect from './TableLeaveDirect.js';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -28,6 +31,9 @@ root.render(
       <Route path="/user" element={<AttenSystemUser />} />
       <Route path="/atten/:tec_id" element={<TableAttendanceUser />} />
       <Route path="/leaverecords" element={<TableLeaveRecords />} />
+      <Route path="/leavedirect" element={<TableLeaveDirect />} />
+      <Route path="/leavrecuser/:tec_id" element={<TableLeaveUser />} />
+      <Route path="/director" element={<AttendSystemDirect />} />
 
     </Routes>
   </BrowserRouter>
