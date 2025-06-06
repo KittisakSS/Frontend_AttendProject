@@ -4,7 +4,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
+// import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -113,9 +113,9 @@ export default function SignIn() {
                 value={password} // Set value from state
                 onChange={(e) => setPassword(e.target.value)} // Update state when input changes
               />
-              <Link href="#" variant="body2" sx={{ display: 'block', textAlign: 'right', mt: 1, mb: 3 }}>
+              {/* <Link href="#" variant="body2" sx={{ display: 'block', textAlign: 'right', mt: 1, mb: 3 }}>
                 ลืมรหัสผ่าน?
-              </Link>
+              </Link> */}
               <Grid container spacing={2}>
                 {/* <Grid item xs={6}>
                   <Button

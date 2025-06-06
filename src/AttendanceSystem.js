@@ -239,6 +239,12 @@ const AttendanceSystem = () => {
       });
     };
 
+    const currentDateText = currentTime.toLocaleDateString("th-TH", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+});
+
   return (
     <Root>
       <Header position="static">
@@ -298,9 +304,7 @@ const AttendanceSystem = () => {
           </Button>
         </ProfileCard>
 
-        <Clock>
-          {currentTime.toLocaleTimeString("th-TH", { hour12: false })}
-        </Clock>
+        <Clock>{currentDateText} - {currentTime.toLocaleTimeString("th-TH", { hour12: false })}</Clock>
 
         <Grid container justifyContent="center" spacing={2}>
           <Grid item>

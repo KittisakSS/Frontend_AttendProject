@@ -33,6 +33,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/th";
 import buddhistEra from "dayjs/plugin/buddhistEra";
 import { registerTHSarabunNew } from "./fonts/THSarabunNew_base64"; // ปรับตาม path ของคุณ
+import TablePagination from '@mui/material/TablePagination';
 
 
 const Root = styled("div")(({ theme }) => ({
@@ -97,6 +98,10 @@ const [filterEndDate, setFilterEndDate] = useState("");
     t_profile: "",
     position: "",
   });
+
+  const [page, setPage] = useState(0);
+const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตามต้องการ
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -376,45 +381,56 @@ const [filterEndDate, setFilterEndDate] = useState("");
 
 useEffect(() => {
   const fetchPieChartData = () => {
-    let totalPresent = 0;
-    let lateCount = 0;
-    let presentSet = new Set();
+    const presentSet = new Set();
+    const lateSet = new Set();
 
+    // นับคนที่มาและมาสาย (ไม่ซ้ำ)
     filteredAttendanceData.forEach((record) => {
       if (record.Datetime_IN) {
         const inTime = new Date(record.Datetime_IN);
         const lateThreshold = new Date(inTime);
         lateThreshold.setHours(10, 0, 0, 0);
 
-        if (inTime >= lateThreshold) {
-          lateCount++;
-        } else {
-          totalPresent++;
-        }
         presentSet.add(record.tec_id);
+
+        if (inTime >= lateThreshold) {
+          lateSet.add(record.tec_id);
+        }
       }
     });
 
-    const allUserIds = new Set(attendanceData.map((record) => record.tec_id));
-    const totalAbsent = [...allUserIds].filter((id) => !presentSet.has(id)).length;
+    // นับคนที่ลา (เฉพาะที่อนุมัติแล้ว และไม่ซ้ำ)
+    const leaveSet = new Set();
+    filteredLeaveData.forEach((record) => {
+      if (record.approval_status === "อนุมัติการลา") {
+        leaveSet.add(record.tec_id);
+      }
+    });
 
-    const leaveCount = filteredLeaveData.length; // ใช้ filteredLeaveData ที่กำหนดไว้แล้ว
+    // รายชื่อทั้งหมด (จากทุก user ที่เคยมีใน attendanceData)
+    const allUserIds = new Set(attendanceData.map((record) => record.tec_id));
+
+    // คนที่ขาด = ทั้งหมด - (คนที่มา + คนที่ลา)
+    const totalAbsent = [...allUserIds].filter(
+      (id) => !presentSet.has(id) && !leaveSet.has(id)
+    ).length;
 
     setPieChartData([
-      { name: "มา", value: totalPresent },
-      { name: "สาย", value: lateCount },
+      { name: "มา", value: presentSet.size },
+      { name: "สาย", value: lateSet.size },
       { name: "ขาด", value: totalAbsent },
-      { name: "ลา", value: leaveCount },
+      { name: "ลา", value: leaveSet.size },
     ]);
 
-    setTotalPresent(totalPresent);
-    setLateCount(lateCount);
+    setTotalPresent(presentSet.size);
+    setLateCount(lateSet.size);
     setTotalAbsent(totalAbsent);
-    setApprovedLeaveCount(leaveCount);
+    setApprovedLeaveCount(leaveSet.size);
   };
 
   fetchPieChartData();
-}, [filteredAttendanceData, attendanceData, filteredLeaveData]); // filteredLeaveData มีค่าก่อนใช้แน่นอน
+}, [filteredAttendanceData, attendanceData, filteredLeaveData]);
+ // filteredLeaveData มีค่าก่อนใช้แน่นอน
 
     
     const formatDate = (datetime) => {
@@ -426,32 +442,40 @@ useEffect(() => {
 
     // ฟังก์ชันสำหรับการกรองข้อมูล
     useEffect(() => {
-      let filteredData = attendanceData;
-    
-      filteredData = filteredData.filter((record) => {
-        const date = new Date(record.Datetime_IN);
-        const recordDay = date.getDate().toString().padStart(2, "0");
-        const recordMonth = (date.getMonth() + 1).toString().padStart(2, "0");
-        const recordYear = date.getFullYear().toString();
-    
-        const matchDay = filterDay ? recordDay === filterDay : true;
-        const matchMonth = filterMonth ? recordMonth === filterMonth : true;
-        const matchYear = filterYear ? recordYear === filterYear : true;
-    
-        return matchDay && matchMonth && matchYear;
-      });
-    
-      // เพิ่มกรองเฉพาะ Attendance Table ถ้ามี
-      if (filterDate) {
-        filteredData = filteredData.filter((record) => {
-          const recordDate = new Date(record.Datetime_IN).toISOString().split("T")[0];
-          return recordDate === filterDate;
-        });
-      }
-    
-      setFilteredAttendanceData(filteredData.slice(0, 5));
-    }, [filterDate, attendanceData, filterDay, filterMonth, filterYear]); 
-    
+  let filteredData = attendanceData;
+
+  filteredData = filteredData.filter((record) => {
+    const date = new Date(record.Datetime_IN);
+    const recordDay = date.getDate().toString().padStart(2, "0");
+    const recordMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+    const recordYear = date.getFullYear().toString();
+
+    const matchDay = filterDay ? recordDay === filterDay : true;
+    const matchMonth = filterMonth ? recordMonth === filterMonth : true;
+    const matchYear = filterYear ? recordYear === filterYear : true;
+
+    return matchDay && matchMonth && matchYear;
+  });
+
+  if (filterDate) {
+    filteredData = filteredData.filter((record) => {
+      const recordDate = new Date(record.Datetime_IN).toISOString().split("T")[0];
+      return recordDate === filterDate;
+    });
+  }
+
+  setFilteredAttendanceData(filteredData);
+  setPage(0); // รีเซ็ตหน้าทุกครั้งที่กรองใหม่
+}, [filterDate, attendanceData, filterDay, filterMonth, filterYear]);
+ 
+  const [allUsers, setAllUsers] = useState([]);
+
+useEffect(() => {
+  fetch("http://localhost:3333/users")
+    .then((res) => res.json())
+    .then((data) => setAllUsers(data))
+    .catch((err) => console.error("Error fetching users:", err));
+}, []);
 
 const generatePDF = (attendanceData, leaveData, summaryData) => {
   const doc = new jsPDF("p", "mm", "a4");
@@ -523,9 +547,10 @@ dayjs.extend(buddhistEra);
   
 
   // สรุปผล
+const totalUsers = allUsers.length;
   const summaryStartY = doc.lastAutoTable.finalY + 15;
   doc.setFontSize(14);
-  doc.text(`ข้าราชการทั้งหมด: ${summaryData.total} คน`, 14, summaryStartY);
+  doc.text(`ข้าราชการทั้งหมด: ${totalUsers} คน`, 14, summaryStartY);
   doc.text(`มาปฏิบัติงาน: ${summaryData.present}`, 14, summaryStartY + 8);
   doc.text(`มาสาย: ${summaryData.late}`, 70, summaryStartY + 8);
   doc.text(`ขาด: ${summaryData.absent}`, 130, summaryStartY + 8);
@@ -539,7 +564,11 @@ dayjs.extend(buddhistEra);
   doc.save("รายงานลงเวลา.pdf");
 };
 
-    
+  const currentDateText = currentTime.toLocaleDateString("th-TH", {
+  day: "numeric",
+  month: "long",
+  year: "numeric"
+});
     
 
   return (
@@ -593,9 +622,8 @@ dayjs.extend(buddhistEra);
           </Button>
         </ProfileCard>
 
-        <Clock>
-          {currentTime.toLocaleTimeString("th-TH", { hour12: false })}
-        </Clock>
+        <Clock>{currentDateText} - {currentTime.toLocaleTimeString("th-TH", { hour12: false })}</Clock>
+
 
         <Grid container justifyContent="center" spacing={2}>
           <Grid item>
@@ -725,12 +753,16 @@ dayjs.extend(buddhistEra);
       onChange={(e) => setFilterYear(e.target.value)}
       displayEmpty
     >
-      <MenuItem value=""></MenuItem>
-      {["2023", "2024", "2025"].map((year) => (
-        <MenuItem key={year} value={year}>
-          {year}
-        </MenuItem>
-      ))}
+      <MenuItem value="">ทั้งหมด</MenuItem>
+      {Array.from({ length: new Date().getFullYear() + 543 - 2565 + 1 }, (_, i) => {
+        const buddhistYear = 2565 + i;
+        const gregorianYear = (2565 + i - 543).toString(); // ใช้กรองด้วยปี ค.ศ.
+        return (
+          <MenuItem key={buddhistYear} value={gregorianYear}>
+            {buddhistYear}
+          </MenuItem>
+        );
+      })}
     </Select>
   </FormControl>
 </Grid>
@@ -828,26 +860,39 @@ dayjs.extend(buddhistEra);
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredAttendanceData.map((record, index) => (
-            <TableRow key={index}>
-              <TableCell>{record.tec_name}</TableCell>
-              <TableCell>{formatDate(record.Datetime_IN)}</TableCell>
-              <TableCell>{
-                new Date(record.Datetime_IN).toLocaleTimeString("th-TH", {
-                  timeZone: "Asia/Bangkok",
-                })
-              }</TableCell>
-              <TableCell>{
-                record.Datetime_OUT
-                  ? new Date(record.Datetime_OUT).toLocaleTimeString("th-TH", {
-                      timeZone: "Asia/Bangkok",
-                    })
-                  : "-"
-              }</TableCell>
-            </TableRow>
-          ))}
-              </TableBody>
+  {filteredAttendanceData
+    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    .map((record, index) => (
+      <TableRow key={index}>
+        <TableCell>{record.tec_name}</TableCell>
+        <TableCell>{formatDate(record.Datetime_IN)}</TableCell>
+        <TableCell>
+          {new Date(record.Datetime_IN).toLocaleTimeString("th-TH", {
+            timeZone: "Asia/Bangkok",
+          })}
+        </TableCell>
+        <TableCell>
+          {record.Datetime_OUT
+            ? new Date(record.Datetime_OUT).toLocaleTimeString("th-TH", {
+                timeZone: "Asia/Bangkok",
+              })
+            : "-"}
+        </TableCell>
+      </TableRow>
+    ))}
+</TableBody>
             </Table>
+            <TablePagination
+  rowsPerPageOptions={[5, 10, 20]}
+  component="div"
+  count={filteredAttendanceData.length}
+  rowsPerPage={rowsPerPage}
+  page={page}
+  onPageChange={(event, newPage) => setPage(newPage)}
+  onRowsPerPageChange={(event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  }}/>
           </TableContainer>
         </Card>
 
