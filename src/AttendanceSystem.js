@@ -61,7 +61,7 @@ const AttendanceSystem = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("${process.env.REACT_APP_API_URL}/api/authen", {
+    fetch(`${process.env.REACT_APP_API_URL}/authen`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +133,7 @@ const AttendanceSystem = () => {
                 .then((data) => {
                   const locationIn = data.display_name;
     
-                  fetch("${process.env.REACT_APP_API_URL}/api/checkin", {
+                  fetch(`${process.env.REACT_APP_API_URL}/checkin`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -203,7 +203,7 @@ const AttendanceSystem = () => {
                 .then((data) => {
                   const locationOut = data.display_name;
     
-                  fetch("${process.env.REACT_APP_API_URL}/api/checkout", {
+                  fetch(`${process.env.REACT_APP_API_URL}/checkout`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -267,7 +267,7 @@ const AttendanceSystem = () => {
                 component="img"
                 src={
                   userData.t_profile
-                    ? `${process.env.REACT_APP_API_URL}/api/uploads/${userData.t_profile}`
+                    ? `${process.env.REACT_APP_API_URL}/uploads/${userData.t_profile}`
                     : "https://via.placeholder.com/100" // Default image
                 }
                 alt="profile"
