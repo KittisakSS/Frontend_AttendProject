@@ -72,7 +72,7 @@ const TableAttendance = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:3333/attendance")
+    fetch(`${process.env.REACT_APP_API_URL}/attendance`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "ok") {
@@ -83,7 +83,7 @@ const TableAttendance = () => {
           setFilteredData(sortedData);
         }
       });
-    fetch("http://localhost:3333/users")
+    fetch(`${process.env.REACT_APP_API_URL}/users`)
       .then((res) => res.json())
       .then((data) => setUserData(data));
   }, []);

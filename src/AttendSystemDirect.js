@@ -105,7 +105,7 @@ const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตา
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:3333/authen", {
+    fetch(`${process.env.REACT_APP_API_URL}/authen`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -184,7 +184,7 @@ const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตา
                 .then((data) => {
                   const locationIn = data.display_name;
     
-                  fetch("http://localhost:3333/checkin", {
+                  fetch(`${process.env.REACT_APP_API_URL}/checkin`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -254,7 +254,7 @@ const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตา
                 .then((data) => {
                   const locationOut = data.display_name;
     
-                  fetch("http://localhost:3333/checkout", {
+                  fetch(`${process.env.REACT_APP_API_URL}/checkout`, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -293,7 +293,7 @@ const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตา
     useEffect(() => {
       const fetchAttendanceData = async () => {
         try {
-          const res = await fetch("http://localhost:3333/attendance");
+          const res = await fetch(`${process.env.REACT_APP_API_URL}/attendance`);
           const data = await res.json();
           if (data.status === "ok") {
             const sortedData = data.data.sort(
@@ -308,14 +308,14 @@ const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตา
     
       const fetchLeaveData = async () => {
         try {
-          const res = await fetch("http://localhost:3333/leaverecords");
+          const res = await fetch(`${process.env.REACT_APP_API_URL}/leaverecords`);
           const data = await res.json();
           if (data.status === "ok") {
             const updatedData = await Promise.all(
               data.data.map(async (record) => {
                 try {
                   const userRes = await fetch(
-                    `http://localhost:3333/user/${record.tec_id}`
+                    `${process.env.REACT_APP_API_URL}/user/${record.tec_id}`
                   );
                   const userData = await userRes.json();
                   if (userData.status === "ok") {
@@ -471,7 +471,7 @@ useEffect(() => {
   const [allUsers, setAllUsers] = useState([]);
 
 useEffect(() => {
-  fetch("http://localhost:3333/users")
+  fetch(`${process.env.REACT_APP_API_URL}/users`)
     .then((res) => res.json())
     .then((data) => setAllUsers(data))
     .catch((err) => console.error("Error fetching users:", err));
@@ -593,7 +593,7 @@ const totalUsers = allUsers.length;
                 component="img"
                 src={
                   userData.t_profile
-                    ? `http://localhost:3333/uploads/${userData.t_profile}`
+                    ? `${process.env.REACT_APP_API_URL}/uploads/${userData.t_profile}`
                     : "https://via.placeholder.com/100" // Default image
                 }
                 alt="profile"

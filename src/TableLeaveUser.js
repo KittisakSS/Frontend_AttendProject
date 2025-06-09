@@ -68,7 +68,7 @@ const TableLeaveUser = () => {
   };
 
   useEffect(() => {
-    fetch(`http://localhost:3333/leaverecords/${tec_id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/leaverecords/${tec_id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "ok") {

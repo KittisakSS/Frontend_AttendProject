@@ -53,7 +53,7 @@ const TableAttendanceUser = () => {
   }));
 
   useEffect(() => {
-    fetch(`http://localhost:3333/attendance/${tec_id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/attendance/${tec_id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "ok") {
@@ -66,7 +66,7 @@ const TableAttendanceUser = () => {
       })
       .catch((err) => console.error("Error fetching attendance data: ", err));
 
-    fetch(`http://localhost:3333/user/${tec_id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/user/${tec_id}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "ok") {

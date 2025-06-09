@@ -36,7 +36,7 @@ const UserManagement = () => {
       alert("กรุณาเข้าสู่ระบบ");
       window.location = "/login";
     } else {
-      fetch("http://localhost:3333/authen", {
+      fetch(`${process.env.REACT_APP_API_URL}/authen`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +61,7 @@ const UserManagement = () => {
 
   const fetchUsers = () => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:3333/users", {
+    fetch(`${process.env.REACT_APP_API_URL}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -106,8 +106,8 @@ const UserManagement = () => {
   
         const token = localStorage.getItem("token");
         const url = editId
-          ? `http://localhost:3333/users/${editId}`
-          : "http://localhost:3333/register";
+          ? `${process.env.REACT_APP_API_URL}/users/${editId}`
+          : `${process.env.REACT_APP_API_URL}/register`;
         const method = editId ? "PUT" : "POST";
   
         const formData = new FormData();
@@ -150,7 +150,7 @@ const UserManagement = () => {
 
   const handleDelete = (id) => {
     const token = localStorage.getItem("token");
-    fetch(`http://localhost:3333/users/${id}`, {
+    fetch(`${process.env.REACT_APP_API_URL}/users/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -221,7 +221,7 @@ const UserManagement = () => {
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.position}</TableCell>
                 <TableCell>
-                  <img src={`http://localhost:3333/uploads/${user.t_profile}`} alt="Profile" width="50" height="50" />
+                  <img src={`${process.env.REACT_APP_API_URL}/uploads/${user.t_profile}`} alt="Profile" width="50" height="50" />
                 </TableCell>
                 <TableCell>
                   <Button variant="contained" color="primary" onClick={() => handleEdit(user)}>

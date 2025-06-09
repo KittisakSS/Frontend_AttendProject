@@ -75,7 +75,7 @@ const LeaveSystem = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    fetch("http://localhost:3333/authen", {
+    fetch(`${process.env.REACT_APP_API_URL}/authen`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -89,7 +89,7 @@ const LeaveSystem = () => {
 
           // ดึงวันที่ลาล่าสุดจากฐานข้อมูล
           // Debug ก่อนตั้งค่า last_leave_date
-          fetch(`http://localhost:3333/last_leave/${data.user.tec_id}`)
+          fetch(`${process.env.REACT_APP_API_URL}/last_leave/${data.user.tec_id}`)
             .then((res) => res.json())
             .then((leaveData) => {
               console.log("Last Leave API Response:", leaveData);
@@ -153,7 +153,7 @@ const LeaveSystem = () => {
       return;
     }
   
-    fetch("http://localhost:3333/leave", {
+    fetch(`${process.env.REACT_APP_API_URL}/leave`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

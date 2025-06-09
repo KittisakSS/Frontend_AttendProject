@@ -58,7 +58,7 @@ const TableLeaveRecords = () => {
   }));
 
   useEffect(() => {
-    fetch("http://localhost:3333/leaverecords")
+    fetch(`${process.env.REACT_APP_API_URL}/leaverecords`)
       .then((res) => res.json())
       .then((data) => {
         if (data.status === "ok") {
@@ -67,7 +67,7 @@ const TableLeaveRecords = () => {
               data.data.map(async (record) => {
                 try {
                   const response = await fetch(
-                    `http://localhost:3333/user/${record.tec_id}`
+                    `${process.env.REACT_APP_API_URL}/user/${record.tec_id}`
                   );
                   const result = await response.json();
                   if (result.status === "ok") {
@@ -97,7 +97,7 @@ const TableLeaveRecords = () => {
 
   const updateApprovalStatus = async (leave_id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:3333/updateApproval`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/updateApproval`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
