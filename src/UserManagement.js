@@ -23,6 +23,7 @@ const UserManagement = () => {
   const [form, setForm] = useState({
     tec_name: "",
     email: "",
+    password: "", // Add this
     role: "",
     position: "",
     t_profile: "",
@@ -117,7 +118,8 @@ const UserManagement = () => {
         formData.append("position", form.position);
         if (profileImage) {
           formData.append("profileImage", profileImage);
-        }
+        }if (form.password) {
+  formData.append("password", form.password);}
   
         fetch(url, {
           method,
@@ -189,6 +191,7 @@ const UserManagement = () => {
           <form className="form">
             <TextField label="Name" name="tec_name" value={form.tec_name} onChange={handleChange} fullWidth />
             <TextField label="Email" name="email" value={form.email} onChange={handleChange} fullWidth />
+            <TextField label="New Password"name="password"type="password"value={form.password || ""}onChange={handleChange}fullWidth/>
             <TextField label="Role" name="role" value={form.role} onChange={handleChange} fullWidth />
             <TextField label="Position" name="position" value={form.position} onChange={handleChange} fullWidth />
             <input type="file" accept="image/*" onChange={handleImageChange} />
