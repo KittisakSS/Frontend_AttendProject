@@ -16,6 +16,7 @@ const theme = createTheme();
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
+    tecId: "", // เพิ่ม tecId
     tecName: "",
     email: "",
     password: "",
@@ -51,6 +52,7 @@ export default function SignUp() {
 
     // ตรวจสอบข้อมูลที่กรอกครบถ้วน
     if (
+      !formData.tecId || // ตรวจสอบ tecId
       !formData.tecName ||
       !formData.email ||
       !formData.password ||
@@ -72,6 +74,7 @@ export default function SignUp() {
 
     // สร้าง FormData สำหรับการส่งข้อมูล
     const formDataToSend = new FormData();
+    formDataToSend.append("tec_id", formData.tecId); // เพิ่ม tecId
     formDataToSend.append("tec_name", formData.tecName);
     formDataToSend.append("email", formData.email);
     formDataToSend.append("password", formData.password);
@@ -144,7 +147,7 @@ export default function SignUp() {
         >
           <Avatar sx={{ m: 1, bgcolor: "secondary.main" }} />
           <Typography component="h1" variant="h5">
-            Sign Up
+            สมัครผู้ใช้งาน
           </Typography>
           <Box
             component="form"
@@ -152,6 +155,21 @@ export default function SignUp() {
             onSubmit={handleSubmit}
             sx={{ mt: 3 }}
           >
+            {/* ช่องกรอก tec_id */}
+    <Grid item xs={12}>
+      <Typography variant="body2" gutterBottom>
+        ไอดีผู้ใช้
+      </Typography>
+      <TextField
+        required
+        fullWidth
+        id="tecId"
+        name="tecId"
+        placeholder="ใส่ไอดีของคุณ"
+        value={formData.tecId}
+        onChange={handleChange}
+      />
+    </Grid>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
@@ -162,7 +180,7 @@ export default function SignUp() {
                   fullWidth
                   id="tecName"
                   name="tecName"
-                  placeholder="Enter your full name"
+                  placeholder="กรุณาใส่ชื่อเต็ม"
                   value={formData.tecName}
                   onChange={handleChange}
                 />
@@ -176,35 +194,35 @@ export default function SignUp() {
                   fullWidth
                   id="email"
                   name="email"
-                  placeholder="Enter your email address"
+                  placeholder="กรุณาใส่ที่อยู่อีเมลของคุณ"
                   value={formData.email}
                   onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
-                  Role
+                  บทบาท
                 </Typography>
                 <TextField
                   required
                   fullWidth
                   id="role"
                   name="role"
-                  placeholder="Enter your role"
+                  placeholder="กรุณาใส่บทบาทของคุณ"
                   value={formData.role}
                   onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
-                  Position
+                  ตำแหน่ง
                 </Typography>
                 <TextField
                   required
                   fullWidth
                   id="position"
                   name="position"
-                  placeholder="Enter your position"
+                  placeholder="กรุณากรอกตำแหน่งของคุณ"
                   value={formData.position}
                   onChange={handleChange}
                 />
@@ -217,7 +235,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="password"
-                  placeholder="Enter your password"
+                  placeholder="กรุณาใส่รหัสผ่าน"
                   type="password"
                   id="password"
                   value={formData.password}
@@ -232,7 +250,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="confirmPassword"
-                  placeholder="Re-enter your password"
+                  placeholder="ใส่รหัสผ่านอีกครั้ง"
                   type="password"
                   id="confirmPassword"
                   value={formData.confirmPassword}
@@ -243,7 +261,7 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
-                  Input Image to your profile
+                  อัพโหลดรูปโปรไฟล์
                 </Typography>
                 <input
                   type="file"
@@ -259,7 +277,7 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              สมัคร
             </Button>
             <Button
               variant="contained"
@@ -272,7 +290,7 @@ export default function SignUp() {
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link href="/login" variant="body2">
-                  Already have an account? Sign in
+                  มีบัญชีอยู่แล้ว?
                 </Link>
               </Grid>
             </Grid>
