@@ -353,8 +353,9 @@ const AttendanceSystem = () => {
           <Grid item>
             <Button
               variant="outlined"
-              color="#BC3C4C"
-              sx={{ fontWeight: "bold", px: 2 }}
+              sx={{ fontWeight: "bold", px: 2,
+                color: "#BC3C4C",
+               }}
               onClick={() => handleNavigation("/atten")}
             >
               ดูรายการเข้าออก
