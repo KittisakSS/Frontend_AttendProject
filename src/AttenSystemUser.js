@@ -343,7 +343,7 @@ const AttenSystemUser = () => {
         <Grid item>
           <Button
             variant="contained"
-            color="success"
+            color="#dc143c"
             sx={{ fontWeight: "bold", px: 3, py: 1 }}
             onClick={() => (window.location = `/atten/${userData.tec_id}`)}
           >
@@ -351,7 +351,7 @@ const AttenSystemUser = () => {
           </Button>
           <Button
             variant="outlined"
-            color="inherit"
+            color="#dcdcdc"
             sx={{ fontWeight: "bold", px: 2 }}
             onClick={() => (window.location = `/leavrecuser/${userData.tec_id}`)}
           >

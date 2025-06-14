@@ -206,13 +206,13 @@ const UserManagement = () => {
         <Table>
           <TableHead>
             <TableRow className="table-header">
-              <TableCell>tec_id</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Position</TableCell>
-              <TableCell>Profile</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>รหัสผู้ใช้</TableCell>
+              <TableCell>ชื่อผู้ใช้</TableCell>
+              <TableCell>อีเมล</TableCell>
+              <TableCell>บทบาทในระบบ</TableCell>
+              <TableCell>ตำแหน่งงาน</TableCell>
+              <TableCell>โปรไฟล์</TableCell>
+              <TableCell>จัดการ</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -228,10 +228,10 @@ const UserManagement = () => {
                 </TableCell>
                 <TableCell>
                   <Button variant="contained" color="primary" onClick={() => handleEdit(user)}>
-                    Edit
+                    แก้ไข
                   </Button>
                   <Button variant="contained" color="secondary" onClick={() => handleDelete(user.tec_id)}>
-                    Delete
+                    ลบ
                   </Button>
                 </TableCell>
               </TableRow>

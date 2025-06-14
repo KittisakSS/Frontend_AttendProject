@@ -353,7 +353,7 @@ const AttendanceSystem = () => {
           <Grid item>
             <Button
               variant="outlined"
-              color="inherit"
+              color="#dc143c"
               sx={{ fontWeight: "bold", px: 2 }}
               onClick={() => handleNavigation("/atten")}
             >
@@ -362,7 +362,7 @@ const AttendanceSystem = () => {
 
             <Button
               variant="outlined"
-              color="inherit"
+              color="#dcdcdc"
               mr={5}
               sx={{ fontWeight: "bold", px: 2 }}
               onClick={() => handleNavigation("/leavedirect")}

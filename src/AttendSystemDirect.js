@@ -666,7 +666,7 @@ const totalUsers = allUsers.length;
         <Grid container justifyContent="center" spacing={2} mt={3}>
           <Grid item>
             <Button
-              variant="outlined"
+              variant="#dc143c"
               color="inherit"
               sx={{ fontWeight: "bold", px: 2 }}
               onClick={() => handleNavigation("/atten")}
@@ -676,7 +676,7 @@ const totalUsers = allUsers.length;
 
             <Button
               variant="outlined"
-              color="inherit"
+              color="#dcdcdc"
               mr={5}
               sx={{ fontWeight: "bold", px: 2 }}
               onClick={() => handleNavigation("/leaverecords")}
