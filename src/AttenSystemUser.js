@@ -339,26 +339,38 @@ const AttenSystemUser = () => {
             </Button>
           </Grid>
         </Grid>
-        <Grid container justifyContent="center" spacing={2} mt={3}>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="#BC3C4C"
-            sx={{ fontWeight: "bold", px: 3, py: 1 }}
-            onClick={() => (window.location = `/atten/${userData.tec_id}`)}
-          >
-            ดูรายการเข้าออก
-          </Button>
-          <Button
-            variant="outlined"
-            color="#DED9D9"
-            sx={{ fontWeight: "bold", px: 2 }}
-            onClick={() => (window.location = `/leavrecuser/${userData.tec_id}`)}
-          >
-            ดูรายการลา
-          </Button>
-        </Grid>
-        </Grid>
+        <Grid container justifyContent="center" spacing={2} mt={3} >
+                  {/* <Grid item>
+                    <Button variant="outlined" color="primary" sx={{ fontWeight: 'bold', px: 2 }}>
+                      โหลดไฟล์ใบลา
+                    </Button>
+                  </Grid> */}
+                  <Grid item>
+                    <Button
+                      variant="outlined"
+                      sx={{ fontWeight: "bold", px: 2,
+                        backgroundColor: "#a52a2a",
+                        color: "#ffffff",
+                        px: 3,
+                        py: 1,
+                       }}
+                      onClick={() => handleNavigation("/atten")}
+                    >
+                      ดูรายการเข้าออก
+                    </Button>
+                    </Grid> 
+                  <Grid item>        
+                    <Button
+                      variant="outlined"
+                      mr={5}
+                      sx={{ fontWeight: "bold", px: 3,
+                        py: 1, color: "#ffffff", backgroundColor: "#708090",}}
+                      onClick={() => handleNavigation("/leavedirect")}
+                    >
+                      ดูรายการลา
+                    </Button>
+                  </Grid>
+                </Grid>
 
       </Container>
       <Footer>

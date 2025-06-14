@@ -344,7 +344,7 @@ const AttendanceSystem = () => {
           </Grid>
         </Grid>
 
-        <Grid container justifyContent="center" spacing={2} mt={3}>
+        <Grid container justifyContent="center" spacing={2} mt={3} >
           {/* <Grid item>
             <Button variant="outlined" color="primary" sx={{ fontWeight: 'bold', px: 2 }}>
               โหลดไฟล์ใบลา
@@ -354,18 +354,22 @@ const AttendanceSystem = () => {
             <Button
               variant="outlined"
               sx={{ fontWeight: "bold", px: 2,
-                backgroundColor: "#BC3C4C",
+                backgroundColor: "#a52a2a",
+                color: "#ffffff",
+                px: 3,
+                py: 1,
                }}
               onClick={() => handleNavigation("/atten")}
             >
               ดูรายการเข้าออก
             </Button>
-
+            </Grid> 
+          <Grid item>        
             <Button
               variant="outlined"
-              color="#dcdcdc"
               mr={5}
-              sx={{ fontWeight: "bold", px: 2 }}
+              sx={{ fontWeight: "bold", px: 3,
+                py: 1, color: "#ffffff", backgroundColor: "#708090",}}
               onClick={() => handleNavigation("/leavedirect")}
             >
               ดูรายการลา
