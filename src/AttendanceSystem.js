@@ -353,7 +353,7 @@ const AttendanceSystem = () => {
           <Grid item>
             <Button
               variant="outlined"
-              color="#dc143c"
+              color="#BC3C4C"
               sx={{ fontWeight: "bold", px: 2 }}
               onClick={() => handleNavigation("/atten")}
             >
