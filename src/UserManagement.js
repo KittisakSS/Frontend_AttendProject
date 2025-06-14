@@ -183,11 +183,11 @@ const UserManagement = () => {
           ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราชภัฏศรัทธาธรรม
         </Typography>
       </Grid>
-      <h2 className="header">Manage Users</h2>
+      <h2 className="header">จัดการข้อมูลสมาชิก</h2>
 
       {editId && (
         <div className="form-container">
-          <h3>Edit User</h3>
+          <h3>แก้ไขข้อมูล</h3>
           <form className="form">
             <TextField label="Name" name="tec_name" value={form.tec_name} onChange={handleChange} fullWidth />
             <TextField label="Email" name="email" value={form.email} onChange={handleChange} fullWidth />
@@ -196,7 +196,7 @@ const UserManagement = () => {
             <TextField label="Position" name="position" value={form.position} onChange={handleChange} fullWidth />
             <input type="file" accept="image/*" onChange={handleImageChange} />
             <Button variant="contained" color="primary" onClick={handleSubmit} className="submit-button">
-              Update
+              อัปเดต
             </Button>
           </form>
         </div>
