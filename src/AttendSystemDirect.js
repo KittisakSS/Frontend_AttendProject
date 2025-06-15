@@ -689,7 +689,7 @@ const totalUsers = allUsers.length;
                       mr={5}
                       sx={{ fontWeight: "bold", px: 3,
                         py: 1, color: "#ffffff", backgroundColor: "#708090",}}
-                      onClick={() => handleNavigation("/leavedirect")}
+                      onClick={() => handleNavigation("/leaverecords")}
                     >
                       ดูรายการลา
                     </Button>

@@ -221,7 +221,7 @@ const TableLeaveDirect = () => {
           <Button variant="contained" color="secondary" onClick={resetFilters}>
             รีเซ็ต
           </Button>
-          <Button variant="contained" color="error" sx={{ fontWeight: "bold" }} onClick={() => (window.location = "/director")}>
+          <Button variant="contained" color="error" sx={{ fontWeight: "bold" }} onClick={() => (window.location = "/users")}>
                     ย้อนกลับ
                   </Button>
         </FilterContainer>
