@@ -138,6 +138,15 @@ const TableLeaveDirect = () => {
   const handlePageChange = (event, page) => {
     setCurrentPage(page);
   };
+   const handleBack = () => {
+    if (role === "admin") {
+      window.location = "/users";
+    } else if (role === "director") {
+      window.location = "/director";
+    } else {
+      alert("สิทธิ์ของคุณไม่ถูกต้อง");
+    }
+  };
 
   return (
     <Root>
@@ -220,7 +229,7 @@ const TableLeaveDirect = () => {
           <Button variant="contained" color="secondary" onClick={resetFilters}>
             รีเซ็ต
           </Button>
-          <Button variant="contained" color="error" sx={{ fontWeight: "bold" }} onClick={() => (window.location = "/users")}>
+          <Button variant="contained" color="error" sx={{ fontWeight: "bold" }} onClick={handleBack}>
                     ย้อนกลับ
                   </Button>
         </FilterContainer>

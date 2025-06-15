@@ -194,7 +194,7 @@ const UserManagement = () => {
             <TextField label="เปลี่ยนรหัสผ่านใหม่"name="password"type="password"value={form.password || ""}onChange={handleChange}fullWidth/>
             <TextField label="บทบาท" name="role" value={form.role} onChange={handleChange} fullWidth />
             <TextField label="ตำแหน่ง" name="position" value={form.position} onChange={handleChange} fullWidth />
-            <input type="ไฟล์" accept="image/*" onChange={handleImageChange} />
+            <input type="file" accept="image/*" onChange={handleImageChange} />
             <Button variant="contained" color="primary" onClick={handleSubmit} className="submit-button">
               อัปเดต
             </Button>
