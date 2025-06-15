@@ -189,12 +189,12 @@ const UserManagement = () => {
         <div className="form-container">
           <h3>แก้ไขข้อมูล</h3>
           <form className="form">
-            <TextField label="Name" name="tec_name" value={form.tec_name} onChange={handleChange} fullWidth />
-            <TextField label="Email" name="email" value={form.email} onChange={handleChange} fullWidth />
-            <TextField label="New Password"name="password"type="password"value={form.password || ""}onChange={handleChange}fullWidth/>
-            <TextField label="Role" name="role" value={form.role} onChange={handleChange} fullWidth />
-            <TextField label="Position" name="position" value={form.position} onChange={handleChange} fullWidth />
-            <input type="file" accept="image/*" onChange={handleImageChange} />
+            <TextField label="ชื่อ" name="tec_name" value={form.tec_name} onChange={handleChange} fullWidth />
+            <TextField label="อีเมล" name="email" value={form.email} onChange={handleChange} fullWidth />
+            <TextField label="เปลี่ยนรหัสผ่านใหม่"name="password"type="password"value={form.password || ""}onChange={handleChange}fullWidth/>
+            <TextField label="บทบาท" name="role" value={form.role} onChange={handleChange} fullWidth />
+            <TextField label="ตำแหน่ง" name="position" value={form.position} onChange={handleChange} fullWidth />
+            <input type="ไฟล์" accept="image/*" onChange={handleImageChange} />
             <Button variant="contained" color="primary" onClick={handleSubmit} className="submit-button">
               อัปเดต
             </Button>

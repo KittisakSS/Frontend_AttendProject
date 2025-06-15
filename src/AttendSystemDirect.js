@@ -694,6 +694,20 @@ const totalUsers = allUsers.length;
                       ดูรายการลา
                     </Button>
                   </Grid>
+                  <Grid item>        
+                    <button
+  onClick={() =>
+    generatePDF(filteredAttendanceData, filteredLeaveData, {
+      total: attendanceData.length,
+      present: totalPresent,
+      late: lateCount,
+      absent: totalAbsent,
+      leave: ApprovedLeaveCount,
+    })
+  }>
+  พิมพ์รายงาน
+</button>
+                  </Grid>
                 </Grid>
       </Container>
       <Container>

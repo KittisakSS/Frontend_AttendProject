@@ -354,7 +354,7 @@ const AttenSystemUser = () => {
                         px: 3,
                         py: 1,
                        }}
-                      onClick={() => handleNavigation("/atten")}
+                      onClick={() => (window.location = `/atten/${userData.tec_id}`)}
                     >
                       ดูรายการเข้าออก
                     </Button>
@@ -365,7 +365,7 @@ const AttenSystemUser = () => {
                       mr={5}
                       sx={{ fontWeight: "bold", px: 3,
                         py: 1, color: "#ffffff", backgroundColor: "#708090",}}
-                      onClick={() => handleNavigation("/leavedirect")}
+                      onClick={() => (window.location = `/leavrecuser/${userData.tec_id}`)}
                     >
                       ดูรายการลา
                     </Button>
