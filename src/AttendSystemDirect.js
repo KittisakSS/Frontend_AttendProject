@@ -593,7 +593,7 @@ const totalUsers = allUsers.length;
                 component="img"
                 src={
                   userData.t_profile
-                    ? `${process.env.REACT_APP_API_URL}/uploads/${userData.t_profile}`
+                    ? `${process.env.REACT_APP_API_URL}/${userData.t_profile}`
                     : "https://via.placeholder.com/100" // Default image
                 }
                 alt="profile"
