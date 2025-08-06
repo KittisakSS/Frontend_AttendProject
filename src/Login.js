@@ -108,7 +108,7 @@ export default function SignIn() {
           </Typography>
         </Grid>
         {/* Form Section */}
-        <Grid item xs={12} sm={8} md={4} sx={{ margin: 'auto', maxWidth: 400 }}>
+        <Grid item xs={12} sm={8} md={4} sx={{ margin: 'auto', maxWidth: 400, px: 2 }}>
           <Box
             sx={{
               display: 'flex',
