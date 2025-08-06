@@ -307,7 +307,14 @@ const AttenSystemUser = () => {
             <Button
               variant="contained"
               color="primary"
-              sx={{ fontWeight: "bold", px: 3, py: 1 }}
+              sx={{
+                backgroundColor: "#28a745",  // เขียว
+                color: "#fff",
+                fontWeight: "bold",
+                px: 3,
+                py: 1,
+                '&:hover': { backgroundColor: "#218838" }
+              }}
               onClick={handleCheckIn}
             >
               ลงเวลาเข้างาน
@@ -317,7 +324,14 @@ const AttenSystemUser = () => {
             <Button
               variant="contained"
               color="secondary"
-              sx={{ fontWeight: "bold", px: 3, py: 1 }}
+              sx={{
+                backgroundColor: "#007bff",  // น้ำเงิน
+                color: "#fff",
+                fontWeight: "bold",
+                px: 3,
+                py: 1,
+                '&:hover': { backgroundColor: "#0069d9" }
+              }}
               onClick={handleCheckOut}
             >
               ลงเวลาออกงาน
@@ -327,11 +341,12 @@ const AttenSystemUser = () => {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: "#f8b400",
-                color: "#fff",
+                backgroundColor: "#ffc107",  // เหลือง
+                color: "#000",
                 fontWeight: "bold",
                 px: 3,
                 py: 1,
+                '&:hover': { backgroundColor: "#e0a800" }
               }}
               onClick={() => handleNavigation("/leave")}
             >
@@ -340,20 +355,17 @@ const AttenSystemUser = () => {
           </Grid>
         </Grid>
         <Grid container justifyContent="center" spacing={2} mt={3} >
-                  {/* <Grid item>
-                    <Button variant="outlined" color="primary" sx={{ fontWeight: 'bold', px: 2 }}>
-                      โหลดไฟล์ใบลา
-                    </Button>
-                  </Grid> */}
                   <Grid item>
                     <Button
                       variant="outlined"
-                      sx={{ fontWeight: "bold", px: 2,
-                        backgroundColor: "#a52a2a",
-                        color: "#ffffff",
+                      sx={{
+                        backgroundColor: "#6f42c1",  // ม่วง
+                        color: "#fff",
+                        fontWeight: "bold",
                         px: 3,
                         py: 1,
-                       }}
+                        '&:hover': { backgroundColor: "#5936a2" }
+                      }}
                       onClick={() => (window.location = `/atten/${userData.tec_id}`)}
                     >
                       ดูรายการเข้าออก
@@ -363,8 +375,14 @@ const AttenSystemUser = () => {
                     <Button
                       variant="outlined"
                       mr={5}
-                      sx={{ fontWeight: "bold", px: 3,
-                        py: 1, color: "#ffffff", backgroundColor: "#708090",}}
+                      sx={{
+                        backgroundColor: "#17a2b8",  // ฟ้าอ่อน
+                        color: "#fff",
+                        fontWeight: "bold",
+                        px: 3,
+                        py: 1,
+                        '&:hover': { backgroundColor: "#138496" }
+                      }}
                       onClick={() => (window.location = `/leavrecuser/${userData.tec_id}`)}
                     >
                       ดูรายการลา

@@ -14,6 +14,7 @@ import {
 import { styled } from "@mui/material/styles";
 import Avatar from "@mui/material/Avatar";
 import logo from "../src/img/logo.png"
+import Swal from "sweetalert2";
 
 const Root = styled("div")({
   backgroundColor: "#fdf3e3",
@@ -123,6 +124,15 @@ const LeaveSystem = () => {
     }));
   };
 
+  const fieldNames = {
+  leave_type: "ประเภทการลา",
+  written_at: "เขียนที่",
+  absence_date: "ช่วงวันลาที่ต้องการ",
+  phone: "เบอร์โทรศัพท์",
+  leave_status: "รายละเอียดการลา",
+};
+
+
   const handleSubmit = () => {
     const requiredFields = [
       "leave_type",
@@ -133,11 +143,19 @@ const LeaveSystem = () => {
     ];
   
     // ตรวจสอบฟิลด์ใน leaveData
-    for (let field of requiredFields) {
-      if (!leaveData[field]) {
-        alert(`กรุณากรอกข้อมูล ${field} ให้ครบถ้วน`);
-        return;
-      }
+  for (let field of requiredFields) {
+    if (!leaveData[field]) {
+      const fieldName = fieldNames[field] || field;
+
+      Swal.fire({
+        icon: "warning",
+        title: "ข้อมูลไม่ครบถ้วน",
+        text: `กรุณากรอกข้อมูล "${fieldName}" ให้ครบถ้วน`,
+        confirmButtonText: "ตกลง",
+      });
+
+      return;
+    }
     }
   
     // ตรวจสอบฟิลด์ใน userData (เช่น position)
@@ -243,17 +261,18 @@ const LeaveSystem = () => {
           >
             ข้อมูลการลา
           </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="ประเภทการลา"
-                name="leave_type"
-                select
-                value={leaveData.leave_type}
-                onChange={handleChange}
-                fullWidth
-              >
-                <MenuItem value="ลาป่วย">ลาป่วย</MenuItem>
+<Grid container spacing={2}>
+  <Grid item xs={12} sm={6}>
+    <TextField
+      label="ประเภทการลา"
+      name="leave_type"
+      select
+      value={leaveData.leave_type}
+      onChange={handleChange}
+      fullWidth
+    >
+      {/* MenuItem ต่างๆ */}
+                      <MenuItem value="ลาป่วย">ลาป่วย</MenuItem>
                 <MenuItem value="ลากิจ">ลากิจ</MenuItem>
                 <MenuItem value="ลาคลอด">ลาคลอด</MenuItem>
                 <MenuItem value="ลาพักร้อน">ลาพักร้อน</MenuItem>
@@ -264,82 +283,85 @@ const LeaveSystem = () => {
                 <MenuItem value="การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน">การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน</MenuItem>
                 <MenuItem value="การลาเข้ารับการตรวจเลือกหรือเข้ารับการเตรียมพล">การลาติดตามคู่สมรส</MenuItem>
                 <MenuItem value="การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน">การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน</MenuItem>
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="เขียนที่"
-                name="written_at"
-                value={leaveData.written_at}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="เบอร์โทรศัพท์"
-                name="phone"
-                value={leaveData.phone}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
+    </TextField>
+  </Grid>
 
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="วันที่เริ่มต้น"
-                  name="absence_date_start"
-                  type="date"
-                  value={leaveData.absence_date.split(" - ")[0] || ""}
-                  onChange={(e) =>
-                    handleChangeDateRange(
-                      e.target.value,
-                      leaveData.absence_date.split(" - ")[1] || ""
-                    )
-                  }
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="วันที่สิ้นสุด"
-                  name="absence_date_end"
-                  type="date"
-                  value={leaveData.absence_date.split(" - ")[1] || ""}
-                  onChange={(e) =>
-                    handleChangeDateRange(
-                      leaveData.absence_date.split(" - ")[0] || "",
-                      e.target.value
-                    )
-                  }
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Grid>
-            </Grid>
+  <Grid item xs={12} sm={6}>
+    <TextField
+      label="เขียนที่"
+      name="written_at"
+      value={leaveData.written_at}
+      onChange={handleChange}
+      fullWidth
+    />
+  </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="วันที่ลาล่าสุด"
-                value={leaveData.last_leave_date}
-                InputProps={{ readOnly: true }}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="รายละเอียดการลา"
-                name="leave_status"
-                multiline
-                rows={3}
-                value={leaveData.leave_status}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
-          </Grid>
+  <Grid item xs={12} sm={6}>
+    <TextField
+      label="เบอร์โทรศัพท์"
+      name="phone"
+      value={leaveData.phone}
+      onChange={handleChange}
+      fullWidth
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={6}>
+    <TextField
+      label="วันที่เริ่มต้นลา"
+      name="absence_date_start"
+      type="date"
+      value={leaveData.absence_date.split(" - ")[0] || ""}
+      onChange={(e) =>
+        handleChangeDateRange(
+          e.target.value,
+          leaveData.absence_date.split(" - ")[1] || ""
+        )
+      }
+      fullWidth
+      InputLabelProps={{ shrink: true }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={6}>
+    <TextField
+      label="วันที่สิ้นสุดลา"
+      name="absence_date_end"
+      type="date"
+      value={leaveData.absence_date.split(" - ")[1] || ""}
+      onChange={(e) =>
+        handleChangeDateRange(
+          leaveData.absence_date.split(" - ")[0] || "",
+          e.target.value
+        )
+      }
+      fullWidth
+      InputLabelProps={{ shrink: true }}
+    />
+  </Grid>
+
+  <Grid item xs={12} sm={6}>
+    <TextField
+      label="วันที่ลาคร้งล่าสุด"
+      value={leaveData.last_leave_date}
+      InputProps={{ readOnly: true }}
+      fullWidth
+    />
+  </Grid>
+
+  <Grid item xs={12}>
+    <TextField
+      label="รายละเอียดการลา"
+      name="leave_status"
+      multiline
+      rows={3}
+      value={leaveData.leave_status}
+      onChange={handleChange}
+      fullWidth
+    />
+  </Grid>
+</Grid>
+
 
           <Box textAlign="center" sx={{ mt: 4 }}>
             <Button

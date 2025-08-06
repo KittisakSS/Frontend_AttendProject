@@ -84,9 +84,13 @@ const [filteredAttendanceData, setFilteredAttendanceData] = useState([]);
 const [filterDate, setFilterDate] = useState(""); // สำหรับเก็บค่าวันที่กรอง
   const [totalPresent, setTotalPresent] = useState(0);
   const [ApprovedLeaveCount, setApprovedLeaveCount] = useState(0);
-  const [filterDay, setFilterDay] = useState("");
-const [filterMonth, setFilterMonth] = useState("");
-const [filterYear, setFilterYear] = useState("");
+
+const today = new Date();
+const [filterDay, setFilterDay] = useState(today.getDate().toString().padStart(2, "0"));
+const [filterMonth, setFilterMonth] = useState((today.getMonth() + 1).toString().padStart(2, "0"));
+const [filterYear, setFilterYear] = useState(today.getFullYear().toString());
+
+
   const [filterStartDate, setFilterStartDate] = useState("");
 const [filterEndDate, setFilterEndDate] = useState("");
   const [lateCount, setLateCount] = useState(0);
@@ -102,6 +106,10 @@ const [filterEndDate, setFilterEndDate] = useState("");
   const [page, setPage] = useState(0);
 const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตามต้องการ
 
+const [leavePage, setLeavePage] = useState(0);
+const [leaveRowsPerPage, setLeaveRowsPerPage] = useState(5);
+
+
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -114,7 +122,7 @@ const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตา
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Role received from API:", data.user.role); // Debug log
+        // console.log("Role received from API:", data.user.role); // Debug log
   
         if (data.status === "ok") {
           if (data.user.role !== "director") {
@@ -384,22 +392,18 @@ useEffect(() => {
     const presentSet = new Set();
     const lateSet = new Set();
 
-    // นับคนที่มาและมาสาย (ไม่ซ้ำ)
     filteredAttendanceData.forEach((record) => {
       if (record.Datetime_IN) {
         const inTime = new Date(record.Datetime_IN);
         const lateThreshold = new Date(inTime);
-        lateThreshold.setHours(10, 0, 0, 0);
-
+        lateThreshold.setHours(8, 30, 0, 0);
         presentSet.add(record.tec_id);
-
         if (inTime >= lateThreshold) {
           lateSet.add(record.tec_id);
         }
       }
     });
 
-    // นับคนที่ลา (เฉพาะที่อนุมัติแล้ว และไม่ซ้ำ)
     const leaveSet = new Set();
     filteredLeaveData.forEach((record) => {
       if (record.approval_status === "อนุมัติการลา") {
@@ -407,21 +411,19 @@ useEffect(() => {
       }
     });
 
-    // รายชื่อทั้งหมด (จากทุก user ที่เคยมีใน attendanceData)
     const allUserIds = new Set(attendanceData.map((record) => record.tec_id));
-
-    // คนที่ขาด = ทั้งหมด - (คนที่มา + คนที่ลา)
     const totalAbsent = [...allUserIds].filter(
       (id) => !presentSet.has(id) && !leaveSet.has(id)
     ).length;
 
-    setPieChartData([
+    const newPieData = [
       { name: "มา", value: presentSet.size },
       { name: "สาย", value: lateSet.size },
       { name: "ขาด", value: totalAbsent },
       { name: "ลา", value: leaveSet.size },
-    ]);
+    ];
 
+    setPieChartData(prev => JSON.stringify(prev) === JSON.stringify(newPieData) ? prev : newPieData);
     setTotalPresent(presentSet.size);
     setLateCount(lateSet.size);
     setTotalAbsent(totalAbsent);
@@ -430,7 +432,8 @@ useEffect(() => {
 
   fetchPieChartData();
 }, [filteredAttendanceData, attendanceData, filteredLeaveData]);
- // filteredLeaveData มีค่าก่อนใช้แน่นอน
+
+
 
     
     const formatDate = (datetime) => {
@@ -477,8 +480,158 @@ useEffect(() => {
     .catch((err) => console.error("Error fetching users:", err));
 }, []);
 
-const generatePDF = (attendanceData, leaveData, summaryData) => {
+// ฟังก์ชันหาจำนวนวันทำงานในเดือนนั้น (ไม่รวมเสาร์-อาทิตย์)
+function getWorkingDaysInMonth(month, year) {
+  const daysInMonth = new Date(year, month, 0).getDate();
+  let workDays = 0;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const current = new Date(year, month - 1, day);
+    const dayOfWeek = current.getDay(); // 0=Sun, 6=Sat
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      workDays++;
+    }
+  }
+  return workDays;
+}
+
+
+function summarizeMonthlyByPerson(attendanceData, leaveData, allUsers, month, year) {
+  const workDays = getWorkingDaysInMonth(month, year); // ไม่รวมเสาร์-อาทิตย์
+  const summary = [];
+
+  allUsers.forEach(user => {
+    const userAttendance = attendanceData.filter(
+      (a) =>
+        a.tec_id === user.tec_id &&
+        new Date(a.Datetime_IN).getMonth() + 1 === parseInt(month) &&
+        new Date(a.Datetime_IN).getFullYear() === parseInt(year)
+    );
+
+    const presentDates = new Set();
+    let lateCount = 0;
+
+    userAttendance.forEach(record => {
+      const date = new Date(record.Datetime_IN);
+      const dateStr = date.toISOString().split('T')[0];
+      presentDates.add(dateStr);
+
+      const hour = date.getHours();
+      const minute = date.getMinutes();
+      if (hour > 8 || (hour === 8 && minute > 30)) {
+        lateCount++;
+      }
+    });
+
+const leaveDates = new Set();
+
+leaveData.forEach(leave => {
+  if (
+    leave.tec_id === user.tec_id &&
+    leave.approval_status === "อนุมัติการลา"
+  ) {
+    // ✅ กรณี leave.absence_date = "2025-07-30 - 2025-08-01"
+    let [startStr, endStr] = leave.absence_date.split(" - ").map(s => s.trim());
+
+    // ✅ fallback กรณีไม่มี endStr เช่น ลา 1 วัน (ใช้วันเดียวกัน)
+    if (!endStr) endStr = startStr;
+
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const isWorkDay = d.getDay() !== 0 && d.getDay() !== 6;
+      const isInMonth =
+        d.getMonth() + 1 === parseInt(month) &&
+        d.getFullYear() === parseInt(year);
+      if (isWorkDay && isInMonth) {
+        leaveDates.add(d.toISOString().split('T')[0]);
+      }
+    }
+  }
+});
+
+
+    const totalPresent = presentDates.size;
+    const totalLeave = leaveDates.size;
+    const totalAbsent = workDays - totalPresent - totalLeave;
+
+    summary.push({
+      name: user.tec_name,
+      present: totalPresent,
+      late: lateCount,
+      absent: totalAbsent,
+      leave: totalLeave,
+    });
+  });
+
+  return summary;
+}
+
+
+const generatePDF = (attendanceData, leaveData, summaryData, filterDay, filterMonth, filterYear, allUsers) => {
   const doc = new jsPDF("p", "mm", "a4");
+
+if (filterYear && filterMonth && !filterDay) {
+  // 👉 สรุปรายบุคคลสำหรับรายเดือน
+  const monthlySummary = summarizeMonthlyByPerson(attendanceData, leaveData, allUsers, filterMonth, filterYear);
+
+    // ลงทะเบียนฟอนต์
+  registerTHSarabunNew(doc);
+  doc.setFont("THSarabunNew", "normal");
+
+// ✅ แปลงเลขเดือนเป็นภาษาไทย
+const thaiMonths = [
+  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
+];
+const thaiMonth = thaiMonths[parseInt(filterMonth, 10) - 1];
+const thaiYear = (parseInt(filterYear, 10) + 543).toString();
+
+// ✅ หัวเรื่องสำหรับรายเดือน
+doc.setFont("THSarabunNew", "normal");
+doc.setFontSize(16);
+doc.text("บัญชีลงเวลาข้าราชการครูและบุคลากรสถานศึกษา", 105, 15, { align: "center" });
+doc.text(`ประจำเดือน ${thaiMonth} ${thaiYear} โรงเรียนวัดราษฎร์ศรัทธาธรรม`, 105, 23, { align: "center" });
+// doc.text("โรงเรียนวัดราษฎร์ศรัทธาธรรม", 105, 31, { align: "center" });
+
+doc.setFont("THSarabunNew", "normal");
+doc.setFontSize(12);
+
+  autoTable(doc, {
+    startY: 30,
+    head: [["ลำดับ", "ชื่อ", "มาปฏิบัติงาน", "มาสาย", "ขาด", "ลา"]],
+    body: monthlySummary
+    .filter(item => item && item.name)  // กรอง null/undefined และวัตถุไม่มีชื่อ
+    .map((item, index) => [
+      index + 1,
+      item.name,
+      item.present,
+      item.late,
+      item.absent,
+      item.leave,
+    ]),
+    styles: {
+      font: "THSarabunNew",
+      fontStyle: "normal",
+      fontSize: 12,
+    },
+    headStyles: {
+      font: "THSarabunNew",
+      fontStyle: "normal",
+      fontSize: 12,
+      fillColor: [41, 128, 185],
+      textColor: 255,
+    },
+  });
+
+  // ✅ ลายเซ็น
+  const y = doc.lastAutoTable.finalY + 20;
+  doc.text("ลงชื่อ.............................................", 140, y);
+  doc.text("(ผู้อำนวยการโรงเรียนวัดราษฎร์ศรัทธาธรรม)", 125, y + 7);
+
+  doc.save("รายงานลงเวลารายเดือน.pdf");
+  return; // ⛔ จบการทำงานตรงนี้ ไม่ต้องไปพิมพ์แบบรายวัน
+}
 
   dayjs.locale("th");
 dayjs.extend(buddhistEra);
@@ -487,12 +640,36 @@ dayjs.extend(buddhistEra);
   registerTHSarabunNew(doc);
   doc.setFont("THSarabunNew", "normal");
 
+  // ✅ ดึงวันที่จาก filter หรือใช้ปัจจุบัน
+  let displayDate;
+  if (filterYear || filterMonth || filterDay) {
+    const year = filterYear || dayjs().year().toString();
+    const month = filterMonth || "01";
+    const day = filterDay || "01";
+    displayDate = dayjs(`${year}-${month}-${day}`);
+  } else {
+    displayDate = dayjs();
+  }
+
+  // ✅ กำหนดข้อความหัวรายงานตาม filter
+  let dateLabel = "";
+  if (filterYear && filterMonth && filterDay) {
+    dateLabel = `ประจำวัน ${displayDate.format("D MMMM BBBB")}`;
+  } else if (filterYear && filterMonth) {
+    dateLabel = `ประจำเดือน ${displayDate.format("MMMM BBBB")}`;
+  } else if (filterYear) {
+    dateLabel = `ประจำปี ${displayDate.format("BBBB")}`;
+  } else {
+    dateLabel = `ประจำวัน ${displayDate.format("D MMMM BBBB")}`;
+  }
+
   // หัวเรื่อง
   doc.setFontSize(18);
   doc.text("บัญชีลงเวลาข้าราชการครูและบุคลากรสถานศึกษา", 105, 15, { align: "center" });
 
   doc.setFontSize(14);
-  doc.text(`ประจำวัน ${dayjs().format("D MMMM BBBB")} โรงเรียนวัดราษฎร์ศรัทธาธรรม`, 105, 23, { align: "center" });
+  // doc.text(`ประจำวัน ${dayjs().format("D MMMM BBBB")} โรงเรียนวัดราษฎร์ศรัทธาธรรม`, 105, 23, { align: "center" });
+  doc.text(`${dateLabel} โรงเรียนวัดราษฎร์ศรัทธาธรรม`, 105, 23, { align: "center" });
 
   // ตารางลงเวลา
   autoTable(doc, {
@@ -570,6 +747,19 @@ const totalUsers = allUsers.length;
   year: "numeric"
 });
     
+useEffect(() => {
+  const today = new Date();
+  const day = today.getDate().toString().padStart(2, "0");
+  const month = (today.getMonth() + 1).toString().padStart(2, "0");
+  const year = today.getFullYear().toString();
+
+  setFilterDay((prev) => prev || day);
+  setFilterMonth((prev) => prev || month);
+  setFilterYear((prev) => prev || year);
+}, []);
+
+
+
 
   return (
     <Root>
@@ -630,7 +820,14 @@ const totalUsers = allUsers.length;
             <Button
               variant="contained"
               color="primary"
-              sx={{ fontWeight: "bold", px: 3, py: 1 }}
+                sx={{
+                    backgroundColor: "#28a745",  // เขียว
+                    color: "#fff",
+                    fontWeight: "bold",
+                    px: 3,
+                    py: 1,
+                    '&:hover': { backgroundColor: "#218838" }
+                  }}
               onClick={handleCheckIn}
             >
               ลงเวลาเข้างาน
@@ -640,7 +837,14 @@ const totalUsers = allUsers.length;
             <Button
               variant="contained"
               color="secondary"
-              sx={{ fontWeight: "bold", px: 3, py: 1 }}
+              sx={{
+                backgroundColor: "#007bff",  // น้ำเงิน
+                color: "#fff",
+                fontWeight: "bold",
+                px: 3,
+                py: 1,
+                '&:hover': { backgroundColor: "#0069d9" }
+              }}
               onClick={handleCheckOut}
             >
               ลงเวลาออกงาน
@@ -650,11 +854,12 @@ const totalUsers = allUsers.length;
             <Button
               variant="contained"
               sx={{
-                backgroundColor: "#f8b400",
-                color: "#fff",
+                backgroundColor: "#ffc107",  // เหลือง
+                color: "#000",
                 fontWeight: "bold",
                 px: 3,
                 py: 1,
+                '&:hover': { backgroundColor: "#e0a800" }
               }}
               onClick={() => handleNavigation("/leave")}
             >
@@ -672,12 +877,14 @@ const totalUsers = allUsers.length;
                   <Grid item>
                     <Button
                       variant="outlined"
-                      sx={{ fontWeight: "bold", px: 2,
-                        backgroundColor: "#a52a2a",
-                        color: "#ffffff",
+                      sx={{
+                        backgroundColor: "#6f42c1",  // ม่วง
+                        color: "#fff",
+                        fontWeight: "bold",
                         px: 3,
                         py: 1,
-                       }}
+                        '&:hover': { backgroundColor: "#5936a2" }
+                      }}
                       onClick={() => handleNavigation("/atten")}
                     >
                       ดูรายการเข้าออก
@@ -687,26 +894,51 @@ const totalUsers = allUsers.length;
                     <Button
                       variant="outlined"
                       mr={5}
-                      sx={{ fontWeight: "bold", px: 3,
-                        py: 1, color: "#ffffff", backgroundColor: "#708090",}}
+                      sx={{
+                        backgroundColor: "#17a2b8",  // ฟ้าอ่อน
+                        color: "#fff",
+                        fontWeight: "bold",
+                        px: 3,
+                        py: 1,
+                        '&:hover': { backgroundColor: "#138496" }
+                      }}
                       onClick={() => handleNavigation("/leaverecords")}
                     >
                       ดูรายการลา
                     </Button>
                   </Grid>
                   <Grid item>        
-                    <button
-  onClick={() =>
-    generatePDF(filteredAttendanceData, filteredLeaveData, {
-      total: attendanceData.length,
-      present: totalPresent,
-      late: lateCount,
-      absent: totalAbsent,
-      leave: ApprovedLeaveCount,
-    })
-  }>
-  พิมพ์รายงาน
-</button>
+                    <Button
+                      variant="outlined"
+                      sx={{
+                        backgroundColor: "#5a5c69",
+                        color: "#fff",
+                        fontWeight: "bold",
+                        px: 3,
+                        py: 1,
+                        '&:hover': {
+                          backgroundColor: "#138496",
+                        },
+                      }}
+                      onClick={() =>
+                        generatePDF(
+                          filteredAttendanceData,
+                          filteredLeaveData,
+                          {
+                            total: attendanceData.length,
+                            present: totalPresent,
+                            late: lateCount,
+                            absent: totalAbsent,
+                            leave: ApprovedLeaveCount,
+                          },
+                          filterDay,
+                          filterMonth,
+                          filterYear,
+                          allUsers  // ✅ เพิ่มตรงนี้!
+                        )
+                      }>
+                    พิมพ์รายงาน
+                  </Button>
                   </Grid>
                 </Grid>
       </Container>
@@ -716,105 +948,136 @@ const totalUsers = allUsers.length;
           <Typography variant="h6" textAlign="center" gutterBottom>
             สถิติการเข้าเรียน/การลา
           </Typography>
-          <Grid container justifyContent="center" spacing={2} alignItems="center">
-          <Grid item>
-  <FormControl sx={{ minWidth: 100 }}>
-    <InputLabel>วัน</InputLabel>
-    <Select
-      value={filterDay}
-      onChange={(e) => setFilterDay(e.target.value)}
-      displayEmpty
-    >
-      <MenuItem value=""></MenuItem>
-      {[...Array(31)].map((_, i) => (
-        <MenuItem key={i + 1} value={(i + 1).toString().padStart(2, "0")}>
-          {i + 1}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</Grid>
-
-<Grid item>
-  <FormControl sx={{ minWidth: 120 }}>
-    <InputLabel>เดือน</InputLabel>
-    <Select
-      value={filterMonth}
-      onChange={(e) => setFilterMonth(e.target.value)}
-      displayEmpty
-    >
-      <MenuItem value=""></MenuItem>
-      {[
-        "01", "02", "03", "04", "05", "06",
-        "07", "08", "09", "10", "11", "12",
-      ].map((month, idx) => (
-        <MenuItem key={month} value={month}>
-          {`${idx + 1}`}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-</Grid>
-
-<Grid item>
-  <FormControl sx={{ minWidth: 120 }}>
-    <InputLabel>ปี</InputLabel>
-    <Select
-      value={filterYear}
-      onChange={(e) => setFilterYear(e.target.value)}
-      displayEmpty
-    >
-      <MenuItem value="">ทั้งหมด</MenuItem>
-      {Array.from({ length: new Date().getFullYear() + 543 - 2565 + 1 }, (_, i) => {
-        const buddhistYear = 2565 + i;
-        const gregorianYear = (2565 + i - 543).toString(); // ใช้กรองด้วยปี ค.ศ.
-        return (
-          <MenuItem key={buddhistYear} value={gregorianYear}>
-            {buddhistYear}
-          </MenuItem>
-        );
-      })}
-    </Select>
-  </FormControl>
-</Grid>
-<Grid item xs={6}>
-    <Button
-      variant="outlined"
-      onClick={() => {
-        setFilterDay("");
-        setFilterMonth("");
-        setFilterYear("");
-      }}
-      sx={{ mt: 1 }}
-    >
-      reset
-    </Button>
-  </Grid>
-
-
-            <Grid item>
-              <PieChart width={400} height={400}>
-                <Pie
-                  data={pieChartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  outerRadius={120}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {pieChartData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip />
-                <Legend />
-              </PieChart>
-            </Grid>
+    <Grid container spacing={2} alignItems="flex-start">
+      {/* ฟอร์มตัวกรอง */}
+      <Grid item xs={12} md={6} sx={{ width: "100%", maxWidth: 400 }}>
+        <Grid container spacing={2}>
+          {/* วัน */}
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel shrink>วัน</InputLabel>
+              <Select
+                value={filterDay || ""}
+                onChange={(e) => setFilterDay(e.target.value)}
+                displayEmpty
+                inputProps={{ "aria-label": "วัน" }}
+              >
+                <MenuItem value="">ทั้งหมด</MenuItem>
+                {[...Array(31)].map((_, i) => {
+                  const val = (i + 1).toString().padStart(2, "0");
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {i + 1}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
           </Grid>
+
+          {/* เดือน */}
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel shrink>เดือน</InputLabel>
+              <Select
+                value={filterMonth || ""}
+                onChange={(e) => setFilterMonth(e.target.value)}
+                displayEmpty
+                inputProps={{ "aria-label": "เดือน" }}
+              >
+                <MenuItem value="">ทั้งหมด</MenuItem>
+                {[...Array(12)].map((_, i) => {
+                  const val = (i + 1).toString().padStart(2, "0");
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {i + 1}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* ปี */}
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <InputLabel shrink>ปี</InputLabel>
+              <Select
+                value={filterYear || ""}
+                onChange={(e) => setFilterYear(e.target.value)}
+                displayEmpty
+                inputProps={{ "aria-label": "ปี" }}
+              >
+                <MenuItem value="">ทั้งหมด</MenuItem>
+                {Array.from(
+                  {
+                    length:
+                      new Date().getFullYear() + 543 - 2565 + 1,
+                  },
+                  (_, i) => {
+                    const buddhistYear = 2565 + i;
+                    const gregorianYear = (2565 + i - 543).toString();
+                    return (
+                      <MenuItem key={buddhistYear} value={gregorianYear}>
+                        {buddhistYear}
+                      </MenuItem>
+                    );
+                  }
+                )}
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* ปุ่มรีเซ็ต */}
+          <Grid item xs={12}>
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => {
+                setFilterDay("");
+                setFilterMonth("");
+                setFilterYear("");
+              }}
+            >
+              รีเซ็ต
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
+
+      {/* Pie Chart */}
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
+        }}
+      >
+        <PieChart width={300} height={300}>
+          <Pie
+            data={pieChartData}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            outerRadius={100}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {pieChartData.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </Grid>
+    </Grid>
         </Card>
 
         {/* Attendance Table */}
@@ -893,17 +1156,22 @@ const totalUsers = allUsers.length;
     ))}
 </TableBody>
             </Table>
-            <TablePagination
-  rowsPerPageOptions={[5, 10, 20]}
-  component="div"
-  count={filteredAttendanceData.length}
-  rowsPerPage={rowsPerPage}
-  page={page}
-  onPageChange={(event, newPage) => setPage(newPage)}
-  onRowsPerPageChange={(event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  }}/>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 20]}
+        component="div"
+        count={filteredAttendanceData.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => setPage(newPage)}
+        onRowsPerPageChange={(event) => {
+          setRowsPerPage(parseInt(event.target.value, 10));
+          setPage(0);
+        }}
+        labelRowsPerPage="รายการที่แสดง"
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}–${to} ของ ${count !== -1 ? count : `มากกว่า ${to}`}`
+        }
+      />
           </TableContainer>
         </Card>
 
@@ -912,7 +1180,7 @@ const totalUsers = allUsers.length;
       <Typography variant="h6" gutterBottom>
         ตารางการลา
       </Typography>
-      <Typography variant="h6" align="center" sx={{ fontWeight: "bold", mt: 2 }}>
+      <Typography variant="h6" align="center" sx={{ fontWeight: "bold", mt: 2 ,mb:2}}>
       จำนวนการลาทั้งหมด: {filteredLeaveData.length} ครั้ง
     </Typography>
       <TextField
@@ -920,6 +1188,7 @@ const totalUsers = allUsers.length;
         type="date"
         value={filterStartDate}
         onChange={(e) => setFilterStartDate(e.target.value)}
+        InputLabelProps={{ shrink: true }} // ✅ เพิ่มบรรทัดนี้
         sx={{ marginRight: 2 }}
       />
       <TextField
@@ -927,6 +1196,7 @@ const totalUsers = allUsers.length;
         type="date"
         value={filterEndDate}
         onChange={(e) => setFilterEndDate(e.target.value)}
+        InputLabelProps={{ shrink: true }} // ✅ เพิ่มบรรทัดนี้
       />
       <TableContainer>
         <Table>
@@ -940,8 +1210,10 @@ const totalUsers = allUsers.length;
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredLeaveData.map((record, index) => (
-              <TableRow key={index}>
+        {filteredLeaveData
+          .slice(leavePage * leaveRowsPerPage, leavePage * leaveRowsPerPage + leaveRowsPerPage)
+          .map((record, index) => (
+            <TableRow key={index}>
                 <TableCell>{record.tec_name}</TableCell>
                 <TableCell>{record.leave_type}</TableCell>
                 <TableCell>{record.absence_date}</TableCell>
@@ -951,6 +1223,22 @@ const totalUsers = allUsers.length;
             ))}
           </TableBody>
         </Table>
+<TablePagination
+  rowsPerPageOptions={[5, 10, 20]}
+  component="div"
+  count={filteredLeaveData.length}
+  rowsPerPage={leaveRowsPerPage}
+  page={leavePage}
+  onPageChange={(event, newPage) => setLeavePage(newPage)}
+  onRowsPerPageChange={(event) => {
+    setLeaveRowsPerPage(parseInt(event.target.value, 10));
+    setLeavePage(0);
+  }}
+  labelRowsPerPage="รายการที่แสดง"
+  labelDisplayedRows={({ from, to, count }) =>
+    `${from}–${to} ของ ${count !== -1 ? count : `มากกว่า ${to}`}`
+  }
+/>
       </TableContainer>
     </Card>
       </Container>

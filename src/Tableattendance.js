@@ -125,7 +125,7 @@ const TableAttendance = () => {
       if (row.Datetime_IN) {
         const inTime = new Date(row.Datetime_IN);
         const lateThreshold = new Date(inTime);
-        lateThreshold.setHours(10, 0, 0, 0); // กำหนดให้ 10:00 น. เป็นเส้นแบ่งสาย
+        lateThreshold.setHours(8, 30, 0, 0); // กำหนดให้ 10:00 น. เป็นเส้นแบ่งสาย
 
         if (inTime >= lateThreshold) {
           lateCount++; // นับเป็นคนที่มาสาย
@@ -228,7 +228,7 @@ const TableAttendance = () => {
             </Button>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "15px" }}>
+        {/* <div style={{ display: "flex", gap: "15px" }}>
           <Typography
             variant="h6"
             color="success"
@@ -256,7 +256,7 @@ const TableAttendance = () => {
           >
             จำนวนคนที่ขาด: {totalAbsent} คน
           </Typography>
-        </div>
+        </div> */}
         <TableContainer component={Paper} sx={{ mt: 2 }}>
           <Table>
             <TableHead>
@@ -290,7 +290,9 @@ const TableAttendance = () => {
                 const inTime = row.Datetime_IN
                   ? new Date(row.Datetime_IN)
                   : null;
-                const isLate = inTime && inTime.getHours() >= 10; // ตรวจสอบว่ามาสาย
+                  const isLate =
+                    inTime &&
+                    (inTime.getHours() > 8 || (inTime.getHours() === 8 && inTime.getMinutes() > 30)); // ตรวจสอบว่ามาสาย
 
                 return (
                   <TableRow

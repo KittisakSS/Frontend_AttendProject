@@ -11,6 +11,8 @@ import Grid from '@mui/material/Grid';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 import logo from "../src/img/logo.png"
+import Swal from 'sweetalert2';
+
 
 const theme = createTheme();
 
@@ -21,6 +23,18 @@ export default function SignIn() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+      // 🔍 เช็กว่าเว้น email หรือ password ไหม
+  if (!email || !password) {
+    Swal.fire({
+      icon: "warning",
+      title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+      text: "ทั้ง Email และ Password ต้องไม่เว้นว่าง",
+      confirmButtonText: "ตกลง"
+    });
+    return;
+  }
+  
     const jsonData = { email, password };
   
     fetch(`${process.env.REACT_APP_API_URL}/login`, {
@@ -30,24 +44,43 @@ export default function SignIn() {
     })
       .then((response) => response.json())
       .then((data) => {
+
         if (data.status === "ok") {
-          alert("Login successful");
+            Swal.fire({
+            icon: "success",
+            title: "เข้าสู่ระบบสำเร็จ",
+            showConfirmButton: false,
+            timer: 1500
+          });
+
           localStorage.setItem("token", data.token);
           localStorage.setItem("role", data.role);  // ✅ เพิ่มการเก็บ role ลงใน localStorage
           localStorage.setItem("password", password);  // ✅ เก็บรหัสผ่าน
   
           // Check role and navigate
-          if (data.role === "admin") {
-            window.location = "/users";
-          } else if (data.role === "user") {
-            window.location = "/user";
-          } else if (data.role === "director") {
-            window.location = "/director";
-          } else {
-            alert("Invalid role");
-          }
+          // ✅ รอ 1.6 วินาที ก่อน redirect
+          setTimeout(() => {
+            if (data.role === "admin") {
+              window.location = "/users";
+            } else if (data.role === "user") {
+              window.location = "/user";
+            } else if (data.role === "director") {
+              window.location = "/director";
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "บทบาทไม่ตรง",
+                text: "ไม่สามารถเข้าสู่ระบบได้"
+              });
+            }
+          }, 1600); // หน่วงเวลาหลัง Swal แสดงครบ
         } else {
-          alert("Login failed: " + data.message);
+        Swal.fire({
+          icon: "error",
+          title: "เข้าสู่ระบบล้มเหลว",
+          text: data.message || "กรุณาตรวจสอบข้อมูลอีกครั้ง",
+          confirmButtonText: "ตกลง"
+        });
         }
       })
       .catch((error) => console.error('Error:', error));
@@ -96,7 +129,7 @@ export default function SignIn() {
                 name="email"
                 autoComplete="email"
                 autoFocus
-                placeholder="Enter your Email"
+                placeholder="โปรดป้อนอีเมลของคุณ"
                 value={email} // Set value from state
                 onChange={(e) => setEmail(e.target.value)} // Update state when input changes
               />
@@ -109,7 +142,7 @@ export default function SignIn() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-                placeholder="Enter your password"
+                placeholder="โปรดป้อนรหัสผ่าน"
                 value={password} // Set value from state
                 onChange={(e) => setPassword(e.target.value)} // Update state when input changes
               />

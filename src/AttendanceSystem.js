@@ -311,7 +311,14 @@ const AttendanceSystem = () => {
             <Button
               variant="contained"
               color="primary"
-              sx={{ fontWeight: "bold", px: 3, py: 1 }}
+                sx={{
+                    backgroundColor: "#28a745",  // เขียว
+                    color: "#fff",
+                    fontWeight: "bold",
+                    px: 3,
+                    py: 1,
+                    '&:hover': { backgroundColor: "#218838" }
+                  }}
               onClick={handleCheckIn}
             >
               ลงเวลาเข้างาน
@@ -321,7 +328,14 @@ const AttendanceSystem = () => {
             <Button
               variant="contained"
               color="secondary"
-              sx={{ fontWeight: "bold", px: 3, py: 1 }}
+                sx={{
+                    backgroundColor: "#007bff",  // น้ำเงิน
+                    color: "#fff",
+                    fontWeight: "bold",
+                    px: 3,
+                    py: 1,
+                    '&:hover': { backgroundColor: "#0069d9" }
+                  }}
               onClick={handleCheckOut}
             >
               ลงเวลาออกงาน
@@ -330,13 +344,14 @@ const AttendanceSystem = () => {
           <Grid item>
             <Button
               variant="contained"
-              sx={{
-                backgroundColor: "#f8b400",
-                color: "#fff",
-                fontWeight: "bold",
-                px: 3,
-                py: 1,
-              }}
+                sx={{
+                  backgroundColor: "#ffc107",  // เหลือง
+                  color: "#000",
+                  fontWeight: "bold",
+                  px: 3,
+                  py: 1,
+                  '&:hover': { backgroundColor: "#e0a800" }
+                }}
               onClick={() => handleNavigation("/leave")}
             >
               ลาราชการ
@@ -353,12 +368,14 @@ const AttendanceSystem = () => {
           <Grid item>
             <Button
               variant="outlined"
-              sx={{ fontWeight: "bold", px: 2,
-                backgroundColor: "#a52a2a",
-                color: "#ffffff",
-                px: 3,
-                py: 1,
-               }}
+                sx={{
+                  backgroundColor: "#6f42c1",  // ม่วง
+                  color: "#fff",
+                  fontWeight: "bold",
+                  px: 3,
+                  py: 1,
+                  '&:hover': { backgroundColor: "#5936a2" }
+                }}
               onClick={() => handleNavigation("/atten")}
             >
               ดูรายการเข้าออก
@@ -368,8 +385,14 @@ const AttendanceSystem = () => {
             <Button
               variant="outlined"
               mr={5}
-              sx={{ fontWeight: "bold", px: 3,
-                py: 1, color: "#ffffff", backgroundColor: "#708090",}}
+                sx={{
+                  backgroundColor: "#17a2b8",  // ฟ้าอ่อน
+                  color: "#fff",
+                  fontWeight: "bold",
+                  px: 3,
+                  py: 1,
+                  '&:hover': { backgroundColor: "#138496" }
+                }}
               onClick={() => handleNavigation("/leavedirect")}
             >
               ดูรายการลา

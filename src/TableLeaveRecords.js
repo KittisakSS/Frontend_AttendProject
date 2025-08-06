@@ -248,9 +248,9 @@ const TableLeaveRecords = () => {
                     ย้อนกลับ
                   </Button>
         </FilterContainer>
-        <Typography variant="h6" align="center" sx={{ fontWeight: "bold", mt: 2 }}>
+        {/* <Typography variant="h6" align="center" sx={{ fontWeight: "bold", mt: 2 }}>
   จำนวนการลาทั้งหมด: {filteredRows.filter(row => row.approval_status === "อนุมัติการลา").length} ครั้ง
-</Typography>
+</Typography> */}
         <TableContainer component={Paper} sx={{ mt: 2 }}>
           <Table>
             <TableHead>
