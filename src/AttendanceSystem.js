@@ -265,11 +265,12 @@ const AttendanceSystem = () => {
             <Grid item>
               <Box
                 component="img"
-                src={
-                  userData.t_profile
-                    ? `${process.env.REACT_APP_API_URL}/uploads/${userData.t_profile}`
-                    : "https://via.placeholder.com/100" // Default image
-                }
+                // src={
+                //   userData.t_profile
+                //     ? `${process.env.REACT_APP_API_URL}/uploads/${userData.t_profile}`
+                //     : "https://via.placeholder.com/100" // Default image
+                // }
+                src={userData.t_profile || "https://via.placeholder.com/100"}
                 alt="profile"
                 width={120}
                 height={120}
@@ -306,7 +307,7 @@ const AttendanceSystem = () => {
 
         <Clock>{currentDateText} - {currentTime.toLocaleTimeString("th-TH", { hour12: false })}</Clock>
 
-        <Grid container justifyContent="center" spacing={2}>
+        {/* <Grid container justifyContent="center" spacing={2}>
           <Grid item>
             <Button
               variant="contained"
@@ -357,7 +358,7 @@ const AttendanceSystem = () => {
               ลาราชการ
             </Button>
           </Grid>
-        </Grid>
+        </Grid> */}
 
         <Grid container justifyContent="center" spacing={2} mt={3} >
           {/* <Grid item>

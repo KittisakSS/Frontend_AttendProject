@@ -109,6 +109,7 @@ const [rowsPerPage, setRowsPerPage] = useState(5); // หรือ 10, 20 ตา
 const [leavePage, setLeavePage] = useState(0);
 const [leaveRowsPerPage, setLeaveRowsPerPage] = useState(5);
 
+const [allUsers, setAllUsers] = useState([]);
 
 
   useEffect(() => {
@@ -361,6 +362,7 @@ const [leaveRowsPerPage, setLeaveRowsPerPage] = useState(5);
     }, []);
     
     // กำหนดค่าของ filteredLeaveData ก่อนที่มันจะถูกใช้
+    const validUserIds = new Set(allUsers.map(user => user.tec_id));
     const filteredLeaveData = leaveData.filter((record) => {
       const recordDateRaw = record.absence_date.split(" - ")[0];
       const date = new Date(recordDateRaw);
@@ -376,6 +378,7 @@ const [leaveRowsPerPage, setLeaveRowsPerPage] = useState(5);
       const matchEnd = filterEndDate ? date <= new Date(filterEndDate) : true;
     
       return (
+        validUserIds.has(record.tec_id) &&  
         matchDay &&
         matchMonth &&
         matchYear &&
@@ -411,7 +414,11 @@ useEffect(() => {
       }
     });
 
-    const allUserIds = new Set(attendanceData.map((record) => record.tec_id));
+    const validUserIds = new Set(allUsers.map(user => user.tec_id));
+    const allUserIds = new Set(attendanceData
+      .filter(record => validUserIds.has(record.tec_id))
+      .map(record => record.tec_id)
+    );
     const totalAbsent = [...allUserIds].filter(
       (id) => !presentSet.has(id) && !leaveSet.has(id)
     ).length;
@@ -431,7 +438,7 @@ useEffect(() => {
   };
 
   fetchPieChartData();
-}, [filteredAttendanceData, attendanceData, filteredLeaveData]);
+}, [filteredAttendanceData, attendanceData, filteredLeaveData,]);
 
 
 
@@ -442,7 +449,7 @@ useEffect(() => {
         timeZone: "Asia/Bangkok",
       });
     };
-
+    
     // ฟังก์ชันสำหรับการกรองข้อมูล
     useEffect(() => {
   let filteredData = attendanceData;
@@ -466,17 +473,20 @@ useEffect(() => {
       return recordDate === filterDate;
     });
   }
+  
+  filteredData = filteredData.filter(record => validUserIds.has(record.tec_id));
 
   setFilteredAttendanceData(filteredData);
   setPage(0); // รีเซ็ตหน้าทุกครั้งที่กรองใหม่
 }, [filterDate, attendanceData, filterDay, filterMonth, filterYear]);
  
-  const [allUsers, setAllUsers] = useState([]);
 
 useEffect(() => {
   fetch(`${process.env.REACT_APP_API_URL}/users`)
-    .then((res) => res.json())
-    .then((data) => setAllUsers(data))
+  .then((res) => res.json())
+  .then((data) => {
+    const filtered = data.filter(user => user.role === "user" || user.role === "director");
+    setAllUsers(filtered);})
     .catch((err) => console.error("Error fetching users:", err));
 }, []);
 
