@@ -267,7 +267,7 @@ const AttenSystemUser = () => {
         <ProfileCard>
           <Grid container alignItems="center" spacing={2}>
             <Grid item>
-              <Box
+              {/* <Box
                 component="img"
                 src={
                   userData.t_profile
@@ -279,7 +279,19 @@ const AttenSystemUser = () => {
                 height={120}
                 borderRadius="50%"
                 boxShadow="0px 3px 10px rgba(0,0,0,0.1)"
-              />
+              /> */}
+              <Box
+              component="img"
+              src={`${process.env.REACT_APP_API_URL}/image/${userData.t_profile}`|| "https://via.placeholder.com/120"}
+              alt="profile"
+              sx={{
+                width: 120,
+                height: 120,
+                borderRadius: "50%",
+                boxShadow: "0px 3px 10px rgba(0,0,0,0.1)",
+                objectFit: "cover"
+              }}
+            />
             </Grid>
             <Grid item>
               <Typography variant="h5" fontWeight="bold">

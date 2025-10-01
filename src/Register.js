@@ -9,6 +9,15 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Swal from "sweetalert2";  // ✅ เพิ่ม SweetAlert2
+import {
+  Select,
+  MenuItem,
+  FormControl,
+} from "@mui/material";
+
+import { IconButton, InputAdornment } from "@mui/material";
+import { Visibility } from "@mui/icons-material";
 
 import logo from "../src/img/logo.png";
 
@@ -25,6 +34,16 @@ export default function SignUp() {
     position: "",
     profileImage: null,
   });
+
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleMouseDownPassword = () => setShowPassword(true);
+  const handleMouseUpPassword = () => setShowPassword(false);
+
+  const handleMouseDownConfirm = () => setShowConfirmPassword(true);
+  const handleMouseUpConfirm = () => setShowConfirmPassword(false);
 
   const handleBack = (event) => {
     event.preventDefault();
@@ -50,9 +69,9 @@ export default function SignUp() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    // ตรวจสอบข้อมูลที่กรอกครบถ้วน
+    // ✅ ตรวจสอบข้อมูลที่กรอกครบถ้วน
     if (
-      !formData.tecId || // ตรวจสอบ tecId
+      !formData.tecId ||
       !formData.tecName ||
       !formData.email ||
       !formData.password ||
@@ -60,21 +79,27 @@ export default function SignUp() {
       !formData.role ||
       !formData.position
     ) {
-      setError("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      Swal.fire("ผิดพลาด!", "กรุณากรอกข้อมูลให้ครบทุกช่อง", "error");
       return;
     }
 
-    // ตรวจสอบรหัสผ่านตรงกัน
+    // ✅ ตรวจสอบอีเมล (ต้องเป็นรูปแบบถูกต้อง)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+    if (!emailRegex.test(formData.email)) {
+      Swal.fire("ผิดพลาด!", "กรุณากรอกอีเมลให้ถูกต้อง เช่น user@gmail.com", "error");
+      return;
+    }
+
+    // ✅ ตรวจสอบรหัสผ่านตรงกัน
     if (formData.password !== formData.confirmPassword) {
-      setError("รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน");
+      Swal.fire("ผิดพลาด!", "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน", "error");
       return;
     }
 
     setError("");
 
-    // สร้าง FormData สำหรับการส่งข้อมูล
     const formDataToSend = new FormData();
-    formDataToSend.append("tec_id", formData.tecId); // เพิ่ม tecId
+    formDataToSend.append("tec_id", formData.tecId);
     formDataToSend.append("tec_name", formData.tecName);
     formDataToSend.append("email", formData.email);
     formDataToSend.append("password", formData.password);
@@ -94,14 +119,15 @@ export default function SignUp() {
       const data = await response.json();
 
       if (data.status === "ok") {
-        alert("สมัครสมาชิกสำเร็จ");
-        window.location = "/login";
+        Swal.fire("สำเร็จ!", "สมัครสมาชิกเรียบร้อยแล้ว", "success").then(() => {
+          window.location = "/login";
+        });
       } else {
-        setError(data.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก");
+        Swal.fire("ผิดพลาด!", data.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก", "error");
       }
     } catch (err) {
       console.error("Error:", err);
-      setError("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
+      Swal.fire("ผิดพลาด!", "เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์", "error");
     }
   };
 
@@ -203,15 +229,19 @@ export default function SignUp() {
                 <Typography variant="body2" gutterBottom>
                   บทบาท
                 </Typography>
-                <TextField
-                  required
-                  fullWidth
-                  id="role"
-                  name="role"
-                  placeholder="กรุณาใส่บทบาทของคุณ"
-                  value={formData.role}
-                  onChange={handleChange}
-                />
+                <FormControl fullWidth required>
+                  <Select
+                    labelId="role-label"
+                    id="role"
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                  >
+                    <MenuItem value="admin">Admin</MenuItem>
+                    <MenuItem value="user">User</MenuItem>
+                    <MenuItem value="director">Director</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
@@ -236,12 +266,29 @@ export default function SignUp() {
                   fullWidth
                   name="password"
                   placeholder="กรุณาใส่รหัสผ่าน"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   id="password"
                   value={formData.password}
                   onChange={handleChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onMouseDown={handleMouseDownPassword}
+                          onMouseUp={handleMouseUpPassword}
+                          onMouseLeave={handleMouseUpPassword}
+                          onTouchStart={handleMouseDownPassword}
+                          onTouchEnd={handleMouseUpPassword}
+                        >
+                          <Visibility />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
                   ยืนยันรหัสผ่าน
@@ -251,12 +298,28 @@ export default function SignUp() {
                   fullWidth
                   name="confirmPassword"
                   placeholder="ใส่รหัสผ่านอีกครั้ง"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   id="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   error={!!error}
                   helperText={error}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          onMouseDown={handleMouseDownConfirm}
+                          onMouseUp={handleMouseUpConfirm}
+                          onMouseLeave={handleMouseUpConfirm}
+                          onTouchStart={handleMouseDownConfirm}
+                          onTouchEnd={handleMouseUpConfirm}
+                        >
+                          <Visibility />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>

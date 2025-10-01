@@ -414,11 +414,12 @@ useEffect(() => {
       }
     });
 
-    const validUserIds = new Set(allUsers.map(user => user.tec_id));
-    const allUserIds = new Set(attendanceData
-      .filter(record => validUserIds.has(record.tec_id))
-      .map(record => record.tec_id)
-    );
+    // const validUserIds = new Set(allUsers.map(user => user.tec_id));
+    // const allUserIds = new Set(attendanceData
+    //   .filter(record => validUserIds.has(record.tec_id))
+    //   .map(record => record.tec_id)
+    // );
+    const allUserIds = new Set(allUsers.map(user => user.tec_id));
     const totalAbsent = [...allUserIds].filter(
       (id) => !presentSet.has(id) && !leaveSet.has(id)
     ).length;
@@ -791,11 +792,7 @@ useEffect(() => {
             <Grid item>
               <Box
                 component="img"
-                src={
-                  userData.t_profile
-                    ? `${process.env.REACT_APP_API_URL}/uploads/${userData.t_profile}`
-                    : "https://via.placeholder.com/100" // Default image
-                }
+                src={`${process.env.REACT_APP_API_URL}/image/${userData.t_profile}`|| "https://via.placeholder.com/120"}
                 alt="profile"
                 width={120}
                 height={120}

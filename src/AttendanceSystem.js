@@ -71,6 +71,7 @@ const AttendanceSystem = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "ok") {
+          // console.log("userData.t_profile =", userData?.t_profile);
           setUserData(data.user); // ใช้ข้อมูลที่ดึงมาเซตให้กับ `userData`
         } else {
           alert("Authentication failed");
@@ -263,20 +264,19 @@ const AttendanceSystem = () => {
         <ProfileCard>
           <Grid container alignItems="center" spacing={2}>
             <Grid item>
-              <Box
-                component="img"
-                // src={
-                //   userData.t_profile
-                //     ? `${process.env.REACT_APP_API_URL}/uploads/${userData.t_profile}`
-                //     : "https://via.placeholder.com/100" // Default image
-                // }
-                src={userData.t_profile || "https://via.placeholder.com/100"}
-                alt="profile"
-                width={120}
-                height={120}
-                borderRadius="50%"
-                boxShadow="0px 3px 10px rgba(0,0,0,0.1)"
-              />
+            <Box
+              component="img"
+              // src={userData?.t_profile?.trim() || "https://via.placeholder.com/120"}
+              src={`${process.env.REACT_APP_API_URL}/image/${userData.t_profile}`|| "https://via.placeholder.com/120"}
+              alt="profile"
+              sx={{
+                width: 120,
+                height: 120,
+                borderRadius: "50%",
+                boxShadow: "0px 3px 10px rgba(0,0,0,0.1)",
+                objectFit: "cover"
+              }}
+            />
             </Grid>
             <Grid item>
               <Typography variant="h5" fontWeight="bold">

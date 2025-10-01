@@ -9,6 +9,10 @@ import {
   Paper,
   Button,
   TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
@@ -150,17 +154,48 @@ const UserManagement = () => {
     });
   };
 
-  const handleDelete = (id) => {
-    const token = localStorage.getItem("token");
-    fetch(`${process.env.REACT_APP_API_URL}/users/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then(() => fetchUsers())
-      .catch(() => alert("Error deleting user"));
-  };
+    const handleDelete = (id) => {
+      Swal.fire({
+        title: "กรอกรหัสผ่านเพื่อยืนยันการลบ",
+        input: "password",
+        inputPlaceholder: "กรอกรหัสผ่าน...",
+        showCancelButton: true,
+        confirmButtonText: "ตกลง",
+        cancelButtonText: "ยกเลิก",
+        inputAttributes: {
+          autocapitalize: "off",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const enteredPassword = result.value;
+          const savedPassword = localStorage.getItem("password");
+
+          if (enteredPassword !== savedPassword) {
+            Swal.fire("ผิดพลาด!", "รหัสผ่านไม่ถูกต้อง", "error");
+            return;
+          }
+
+          const token = localStorage.getItem("token");
+          fetch(`${process.env.REACT_APP_API_URL}/users/${id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+            .then((res) => {
+              if (res.ok) {
+                fetchUsers();
+                Swal.fire("สำเร็จ!", "ลบผู้ใช้เรียบร้อยแล้ว", "success");
+              } else {
+                Swal.fire("ผิดพลาด!", "ไม่สามารถลบผู้ใช้ได้", "error");
+              }
+            })
+            .catch(() =>
+              Swal.fire("ผิดพลาด!", "เกิดข้อผิดพลาดขณะลบผู้ใช้", "error")
+            );
+        }
+      });
+    };
 
   const handleUser = (event) => {
     event.preventDefault();
@@ -192,7 +227,21 @@ const UserManagement = () => {
             <TextField label="ชื่อ" name="tec_name" value={form.tec_name} onChange={handleChange} fullWidth />
             <TextField label="อีเมล" name="email" value={form.email} onChange={handleChange} fullWidth />
             <TextField label="เปลี่ยนรหัสผ่านใหม่"name="password"type="password"value={form.password || ""}onChange={handleChange}fullWidth/>
-            <TextField label="บทบาท" name="role" value={form.role} onChange={handleChange} fullWidth />
+            {/* <TextField label="บทบาท" name="role" value={form.role} onChange={handleChange} fullWidth /> */}
+            <FormControl fullWidth>
+            <InputLabel id="role-label">บทบาท</InputLabel>
+            <Select
+              labelId="role-label"
+              id="role"
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+            >
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="user">User</MenuItem>
+              <MenuItem value="director">Director</MenuItem>
+            </Select>
+          </FormControl>
             <TextField label="ตำแหน่ง" name="position" value={form.position} onChange={handleChange} fullWidth />
             <input type="file" accept="image/*" onChange={handleImageChange} />
             <Button variant="contained" color="primary" onClick={handleSubmit} className="submit-button">
@@ -224,7 +273,13 @@ const UserManagement = () => {
                 <TableCell>{user.role}</TableCell>
                 <TableCell>{user.position}</TableCell>
                 <TableCell>
-                  <img src={`${process.env.REACT_APP_API_URL}/uploads/${user.t_profile}`} alt="Profile" width="50" height="50" />
+                    <img
+                      src={`${process.env.REACT_APP_API_URL}/image/${user.t_profile}`}
+                      alt="Profile"
+                      width="50"
+                      height="50"
+                      style={{ borderRadius: "50%", objectFit: "cover" }}
+                    />
                 </TableCell>
                 <TableCell>
                   <Button variant="contained" color="primary" onClick={() => handleEdit(user)}>
