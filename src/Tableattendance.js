@@ -159,6 +159,7 @@ const TableAttendance = () => {
       window.location = "/director";
     } else {
       alert("สิทธิ์ของคุณไม่ถูกต้อง");
+      window.location = "/login";
     }
   };
   

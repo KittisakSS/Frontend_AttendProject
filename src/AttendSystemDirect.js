@@ -359,7 +359,9 @@ const [allUsers, setAllUsers] = useState([]);
     
       fetchAttendanceData();
       fetchLeaveData();
-    }, []);
+    }, [attendanceData.length, leaveData.length]);
+
+    
     
     // กำหนดค่าของ filteredLeaveData ก่อนที่มันจะถูกใช้
     const validUserIds = new Set(allUsers.map(user => user.tec_id));

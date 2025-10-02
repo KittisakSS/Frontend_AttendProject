@@ -66,8 +66,13 @@ const LeaveSystem = () => {
       const storedRole = localStorage.getItem("role");
   
       if (!storedRole) {
-        alert("กรุณาเข้าสู่ระบบก่อน");
-        window.location = "/login"; // ถ้าไม่มี role ให้กลับไปหน้า login
+      Swal.fire({
+      icon: "warning",
+      title: "กรุณาเข้าสู่ระบบก่อน",
+      confirmButtonText: "ตกลง",
+    }).then(() => {
+      window.location = "/login"; // ถ้าไม่มี role ให้กลับไปหน้า login
+    }); // ถ้าไม่มี role ให้กลับไปหน้า login
       } else {
         setRole(storedRole); // เก็บ role ไว้ใน state
       }
@@ -101,9 +106,15 @@ const LeaveSystem = () => {
             })
             .catch((err) => console.error("Error fetching last leave:", err));
         } else {
-          alert("Authentication failed");
+        Swal.fire({
+          icon: "error",
+          title: "Authentication Failed",
+          text: "Token ไม่ถูกต้องหรือหมดอายุ",
+          confirmButtonText: "เข้าสู่ระบบใหม่",
+        }).then(() => {
           localStorage.removeItem("token");
           window.location = "/login";
+        });
         }
       })
       .catch((error) => console.error("Error:", error));
@@ -167,7 +178,12 @@ const LeaveSystem = () => {
     // ตรวจสอบช่วงวันที่
     const [start, end] = leaveData.absence_date.split(" - ");
     if (!start || !end) {
-      alert("กรุณาระบุช่วงวันที่ให้ครบถ้วน");
+        Swal.fire({
+        icon: "warning",
+        title: "ข้อมูลไม่ครบถ้วน",
+        text: "กรุณาระบุช่วงวันที่ให้ครบถ้วน",
+        confirmButtonText: "ตกลง",
+      });
       return;
     }
   
@@ -186,7 +202,12 @@ const LeaveSystem = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "ok") {
-          alert("บันทึกข้อมูลการลาสำเร็จ");
+          Swal.fire({
+          icon: "success",
+          title: "สำเร็จ",
+          text: "บันทึกข้อมูลการลาสำเร็จ",
+          confirmButtonText: "ตกลง",
+        });
           setLeaveData({
             leave_type: "",
             written_at: "",
@@ -197,12 +218,22 @@ const LeaveSystem = () => {
             approval_status: "ยังไม่อนุมัติการลา",
           });
         } else {
-          alert("เกิดข้อผิดพลาด: " + data.message);
+        Swal.fire({
+          icon: "error",
+          title: "เกิดข้อผิดพลาด",
+          text: data.message,
+          confirmButtonText: "ตกลง",
+        });
         }
       })
       .catch((error) => {
         console.error("Error:", error);
-        alert("ไม่สามารถบันทึกข้อมูลการลาได้ โปรดลองอีกครั้ง");
+        Swal.fire({
+        icon: "error",
+        title: "ไม่สามารถบันทึกได้",
+        text: "โปรดลองอีกครั้ง",
+        confirmButtonText: "ตกลง",
+      });
       });
   };
   
@@ -215,6 +246,7 @@ const LeaveSystem = () => {
       window.location = "/user";
     } else {
       alert("สิทธิ์ของคุณไม่ถูกต้อง");
+      window.location = "/login";
     }
   };
 
