@@ -320,7 +320,22 @@ const TableLeaveRecords = () => {
                   </TableCell>
                   <TableCell>{row.phone}</TableCell>
                   <TableCell>{row.leave_status}</TableCell>
-                  <TableCell>{row.approval_status}</TableCell>
+                  {/* <TableCell>{row.approval_status}</TableCell> */}
+                  <TableCell
+  sx={{
+    fontWeight: "bold",
+    backgroundColor:
+      row.approval_status === "อนุมัติการลา"
+        ? "#d4edda" // เขียวอ่อน
+        : row.approval_status === "ยังไม่อนุมัติการลา"
+        ? "#f8d7da" // แดงอ่อน
+        : "inherit",
+      width: "150px"
+  }}
+>
+  {row.approval_status}
+</TableCell>
+
                   <TableCell>
                     <Button
                       onClick={() =>

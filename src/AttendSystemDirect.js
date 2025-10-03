@@ -364,32 +364,92 @@ const [allUsers, setAllUsers] = useState([]);
     
     
     // กำหนดค่าของ filteredLeaveData ก่อนที่มันจะถูกใช้
-    const validUserIds = new Set(allUsers.map(user => user.tec_id));
-    const filteredLeaveData = leaveData.filter((record) => {
-      const recordDateRaw = record.absence_date.split(" - ")[0];
-      const date = new Date(recordDateRaw);
-      const day = date.getDate().toString().padStart(2, "0");
-      const month = (date.getMonth() + 1).toString().padStart(2, "0");
-      const year = date.getFullYear().toString();
+    // const validUserIds = new Set(allUsers.map(user => user.tec_id));
+    // const filteredLeaveData = leaveData.filter((record) => {
+    //   const recordDateRaw = record.absence_date.split(" - ")[0];
+    //   const date = new Date(recordDateRaw);
+    //   const day = date.getDate().toString().padStart(2, "0");
+    //   const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    //   const year = date.getFullYear().toString();
     
-      const matchDay = filterDay ? day === filterDay : true;
-      const matchMonth = filterMonth ? month === filterMonth : true;
-      const matchYear = filterYear ? year === filterYear : true;
+    //   const matchDay = filterDay ? day === filterDay : true;
+    //   const matchMonth = filterMonth ? month === filterMonth : true;
+    //   const matchYear = filterYear ? year === filterYear : true;
     
-      const matchStart = filterStartDate ? date >= new Date(filterStartDate) : true;
-      const matchEnd = filterEndDate ? date <= new Date(filterEndDate) : true;
+    //   const matchStart = filterStartDate ? date >= new Date(filterStartDate) : true;
+    //   const matchEnd = filterEndDate ? date <= new Date(filterEndDate) : true;
     
-      return (
-        validUserIds.has(record.tec_id) &&  
-        matchDay &&
-        matchMonth &&
-        matchYear &&
-        matchStart &&
-        matchEnd &&
-        record.approval_status === "อนุมัติการลา"
+    //   return (
+    //     validUserIds.has(record.tec_id) &&  
+    //     matchDay &&
+    //     matchMonth &&
+    //     matchYear &&
+    //     matchStart &&
+    //     matchEnd &&
+    //     record.approval_status === "อนุมัติการลา"
+    //   );
+    // });
+    // กำหนดค่าของ filteredLeaveData ก่อนที่มันจะถูกใช้
+const validUserIds = new Set(allUsers.map(user => user.tec_id));
+
+// const filteredLeaveData = leaveData.filter((record) => {
+//   if (record.approval_status !== "อนุมัติการลา") return false;
+
+//   // ✅ แยกช่วงวันที่ลา เช่น "2025-10-02 - 2025-10-07"
+//   let [startStr, endStr] = record.absence_date.split(" - ").map(s => s.trim());
+//   if (!endStr) endStr = startStr; // ถ้าเป็นการลา 1 วัน
+
+//   const startDate = new Date(startStr);
+//   const endDate = new Date(endStr);
+
+//   // ✅ วันที่ที่ใช้ฟิลเตอร์
+//   const targetDate = new Date(`${filterYear}-${filterMonth}-${filterDay}`);
+
+//   // ✅ เช็คว่า targetDate อยู่ในช่วงการลา
+//   const isInRange = targetDate >= startDate && targetDate <= endDate;
+
+//   // ✅ ฟิลเตอร์ช่วงวันที่เริ่ม-สิ้นสุด
+//   const matchStart = filterStartDate ? endDate >= new Date(filterStartDate) : true;
+//   const matchEnd = filterEndDate ? startDate <= new Date(filterEndDate) : true;
+
+//   return validUserIds.has(record.tec_id) && isInRange && matchStart && matchEnd;
+// });
+
+const filteredLeaveData = leaveData.filter((record) => {
+  if (record.approval_status !== "อนุมัติการลา") return false;
+
+  let [startStr, endStr] = record.absence_date.split(" - ").map(s => s.trim());
+  if (!endStr) endStr = startStr;
+
+  const startDate = new Date(startStr);
+  const endDate = new Date(endStr);
+
+  let isInRange = true;
+
+  if (filterDay) {
+    // ✅ ฟิลเตอร์แบบวัน
+    const targetDate = new Date(`${filterYear}-${filterMonth}-${filterDay}`);
+    isInRange = targetDate >= startDate && targetDate <= endDate;
+  } else {
+    // ✅ ฟิลเตอร์แบบทั้งเดือน
+    isInRange =
+      (startDate.getMonth() + 1 === parseInt(filterMonth) &&
+        startDate.getFullYear() === parseInt(filterYear)) ||
+      (endDate.getMonth() + 1 === parseInt(filterMonth) &&
+        endDate.getFullYear() === parseInt(filterYear)) ||
+      (
+        startDate <= new Date(`${filterYear}-${filterMonth}-31`) &&
+        endDate >= new Date(`${filterYear}-${filterMonth}-01`)
       );
-    });
-        
+  }
+
+  const matchStart = filterStartDate ? endDate >= new Date(filterStartDate) : true;
+  const matchEnd = filterEndDate ? startDate <= new Date(filterEndDate) : true;
+
+  return validUserIds.has(record.tec_id) && isInRange && matchStart && matchEnd;
+});
+
+
     
 
 useEffect(() => {
@@ -994,7 +1054,7 @@ useEffect(() => {
                 displayEmpty
                 inputProps={{ "aria-label": "เดือน" }}
               >
-                <MenuItem value="">ทั้งหมด</MenuItem>
+                {/* <MenuItem value="">ทั้งหมด</MenuItem> */}
                 {[...Array(12)].map((_, i) => {
                   const val = (i + 1).toString().padStart(2, "0");
                   return (
@@ -1017,7 +1077,7 @@ useEffect(() => {
                 displayEmpty
                 inputProps={{ "aria-label": "ปี" }}
               >
-                <MenuItem value="">ทั้งหมด</MenuItem>
+                {/* <MenuItem value="">ทั้งหมด</MenuItem> */}
                 {Array.from(
                   {
                     length:
@@ -1043,9 +1103,14 @@ useEffect(() => {
               fullWidth
               variant="outlined"
               onClick={() => {
-                setFilterDay("");
-                setFilterMonth("");
-                setFilterYear("");
+                const today = new Date();
+                const day = today.getDate().toString().padStart(2, "0");
+                const month = (today.getMonth() + 1).toString().padStart(2, "0");
+                const year = today.getFullYear().toString();
+
+                setFilterDay(day);
+                setFilterMonth(month);
+                setFilterYear(year);
               }}
             >
               รีเซ็ต
@@ -1095,14 +1160,14 @@ useEffect(() => {
             ตารางลงเวลาเข้า-ออกงาน
           </Typography>
              {/* ตัวกรองวันที่ */}
-    <Box sx={{ marginBottom: 2, display: "flex", justifyContent: "flex-end" }}>
+    {/* <Box sx={{ marginBottom: 2, display: "flex", justifyContent: "flex-end" }}>
       <input
         type="date"
         value={filterDate}
         onChange={(e) => setFilterDate(e.target.value)}
         style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
       />
-    </Box>
+    </Box> */}
     <div style={{ display: "flex", gap: "15px" }}>
               <Typography
                 variant="h6"
@@ -1192,7 +1257,7 @@ useEffect(() => {
       <Typography variant="h6" align="center" sx={{ fontWeight: "bold", mt: 2 ,mb:2}}>
       จำนวนการลาทั้งหมด: {filteredLeaveData.length} ครั้ง
     </Typography>
-      <TextField
+      {/* <TextField
         label="วันที่เริ่มต้น"
         type="date"
         value={filterStartDate}
@@ -1206,7 +1271,7 @@ useEffect(() => {
         value={filterEndDate}
         onChange={(e) => setFilterEndDate(e.target.value)}
         InputLabelProps={{ shrink: true }} // ✅ เพิ่มบรรทัดนี้
-      />
+      /> */}
       <TableContainer>
         <Table>
           <TableHead>
