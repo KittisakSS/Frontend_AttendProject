@@ -1175,6 +1175,7 @@ useEffect(() => {
                 fontWeight="bold"
                 align="center"
                 mt={2}
+                mb={2}
               >
                 จำนวนคนที่มา: {totalPresent} คน
               </Typography>
@@ -1184,6 +1185,7 @@ useEffect(() => {
                 fontWeight="bold"
                 align="center"
                 mt={2}
+                mb={2}
               >
                 จำนวนคนที่มาสาย: {lateCount} คน
               </Typography>
@@ -1193,6 +1195,7 @@ useEffect(() => {
                 fontWeight="bold"
                 align="center"
                 mt={2}
+                mb={2}
               >
                 จำนวนคนที่ขาด: {totalAbsent} คน
               </Typography>
@@ -1200,11 +1203,11 @@ useEffect(() => {
           <TableContainer>
             <Table>
               <TableHead>
-                <TableRow>
-                  <TableCell>ชื่อ</TableCell>
-                  <TableCell>วันที่</TableCell>
-                  <TableCell>เวลาเข้า</TableCell>
-                  <TableCell>เวลาออก</TableCell>
+                <TableRow sx={{ backgroundColor: "#5a6671ff" }}>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>ชื่อ</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>วันที่</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>เวลาเข้า</TableCell>
+                  <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>เวลาออก</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -1275,12 +1278,12 @@ useEffect(() => {
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>ชื่อ</TableCell>
-              <TableCell>ประเภทการลา</TableCell>
-              <TableCell>วันที่ลา</TableCell>
-              <TableCell>สถานะ</TableCell>
-              <TableCell>สถานะการอนุมัติ</TableCell>
+            <TableRow sx={{ backgroundColor: "#5a6671ff" }}>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>ชื่อ</TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>ประเภทการลา</TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>วันที่ลา</TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>สถานะ</TableCell>
+              <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>สถานะการอนุมัติ</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
