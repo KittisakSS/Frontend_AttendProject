@@ -36,6 +36,16 @@ export default function SignIn() {
   }
   
     const jsonData = { email, password };
+
+      // 🌀 แสดง Popup Loading
+  Swal.fire({
+    title: 'กำลังเข้าสู่ระบบ...',
+    text: 'กรุณารอสักครู่',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
   
     fetch(`${process.env.REACT_APP_API_URL}/login`, {
       method: 'POST',
@@ -44,6 +54,8 @@ export default function SignIn() {
     })
       .then((response) => response.json())
       .then((data) => {
+
+        Swal.close(); // 🔒 ปิด popup loading ก่อน
 
         if (data.status === "ok") {
             Swal.fire({
@@ -83,7 +95,16 @@ export default function SignIn() {
         });
         }
       })
-      .catch((error) => console.error('Error:', error));
+          .catch((error) => {
+      Swal.close(); // 🔒 ปิด popup loading ถ้ามี error
+      console.error('Error:', error);
+      Swal.fire({
+        icon: "error",
+        title: "เกิดข้อผิดพลาด",
+        text: "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้",
+        confirmButtonText: "ตกลง"
+      });
+    });
   };
   
 
