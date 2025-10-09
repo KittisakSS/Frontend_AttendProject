@@ -548,8 +548,9 @@ useEffect(() => {
   fetch(`${process.env.REACT_APP_API_URL}/users`)
   .then((res) => res.json())
   .then((data) => {
-    const filtered = data.filter(user => user.role === "user" || user.role === "director");
-    setAllUsers(filtered);})
+    // const filtered = data.filter(user => user.role === "user" || user.role === "director");
+    // setAllUsers(filtered);})
+    setAllUsers(data);})
     .catch((err) => console.error("Error fetching users:", err));
 }, []);
 
@@ -1181,7 +1182,7 @@ useEffect(() => {
               </Typography>
               <Typography
                 variant="h6"
-                color="error"
+                color="#f39200ff"
                 fontWeight="bold"
                 align="center"
                 mt={2}
@@ -1257,7 +1258,7 @@ useEffect(() => {
       <Typography variant="h6" gutterBottom>
         ตารางการลา
       </Typography>
-      <Typography variant="h6" align="center" sx={{ fontWeight: "bold", mt: 2 ,mb:2}}>
+      <Typography variant="h6" color="primary" align="center" sx={{ fontWeight: "bold", mt: 2 ,mb:2}}>
       จำนวนการลาทั้งหมด: {filteredLeaveData.length} ครั้ง
     </Typography>
       {/* <TextField
