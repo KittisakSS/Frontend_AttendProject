@@ -182,7 +182,7 @@ export default function SignUp() {
             sx={{ mt: 3 }}
           >
             {/* ช่องกรอก tec_id */}
-    <Grid item xs={12}>
+    {/* <Grid item xs={12}>
       <Typography variant="body2" gutterBottom>
         ไอดีผู้ใช้
       </Typography>
@@ -195,8 +195,31 @@ export default function SignUp() {
         value={formData.tecId}
         onChange={handleChange}
       />
-    </Grid>
-            <Grid container spacing={2}>
+    </Grid> */}
+     <Grid container spacing={2}>
+    <Grid item xs={12}>
+  <Typography variant="body2" gutterBottom>
+    ไอดีผู้ใช้
+  </Typography>
+  <TextField
+    required
+    fullWidth
+    id="tecId"
+    name="tecId"
+    placeholder="ใส่ไอดีของคุณ"
+    value={formData.tecId}
+    onChange={(e) => {
+      // ✅ อนุญาตเฉพาะตัวเลขและไม่เกิน 4 หลัก
+      const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 4);
+      setFormData({ ...formData, tecId: onlyDigits });
+    }}
+    inputProps={{
+      inputMode: "numeric", // ให้มือถือแสดงคีย์บอร์ดตัวเลข
+      pattern: "[0-9]*",    // ช่วยกันพิมพ์ non-digit
+      maxLength: 4          // จำกัด 4 หลัก
+    }}
+  />
+</Grid>
               <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
                   ชื่อ-สกุล (ระบุคำนำหน้า)
@@ -322,7 +345,7 @@ export default function SignUp() {
                   }}
                 />
               </Grid>
-              <Grid item xs={12}>
+              {/* <Grid item xs={12}>
                 <Typography variant="body2" gutterBottom>
                   อัพโหลดรูปโปรไฟล์
                 </Typography>
@@ -332,7 +355,26 @@ export default function SignUp() {
                   accept="image/*"
                   onChange={handleChange}
                 />
-              </Grid>
+              </Grid> */}
+              <Grid item xs={12}>
+  <Typography variant="body2" gutterBottom>
+    อัพโหลดรูปโปรไฟล์
+  </Typography>
+  <input
+    required  // ✅ บังคับว่าต้องอัพโหลด
+    type="file"
+    name="profileImage"
+    accept="image/*"
+    onChange={handleChange}
+    style={{ display: "block", marginBottom: "8px" }}
+  />
+  {formData.profileImage === null && (
+    <Typography variant="caption" color="error">
+      * กรุณาอัพโหลดรูปโปรไฟล์
+    </Typography>
+  )}
+</Grid>
+
             </Grid>
             <Button
               type="submit"
