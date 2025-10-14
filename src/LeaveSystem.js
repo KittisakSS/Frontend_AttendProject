@@ -304,7 +304,8 @@ const LeaveSystem = () => {
       fullWidth
     >
       {/* MenuItem ต่างๆ */}
-                      <MenuItem value="ลาป่วย">ลาป่วย</MenuItem>
+                <MenuItem value="ลาราชการ">ลาราชการ</MenuItem>
+                <MenuItem value="ลาป่วย">ลาป่วย</MenuItem>
                 <MenuItem value="ลากิจ">ลากิจ</MenuItem>
                 <MenuItem value="ลาคลอด">ลาคลอด</MenuItem>
                 <MenuItem value="ลาพักร้อน">ลาพักร้อน</MenuItem>
@@ -313,8 +314,8 @@ const LeaveSystem = () => {
                 <MenuItem value="การลาอุปสมบทหรือการลาไปประกอบพิธีฮัจย์">การลาอุปสมบทหรือการลาไปประกอบพิธีฮัจย์</MenuItem>
                 <MenuItem value="การลาเข้ารับการตรวจเลือกหรือเข้ารับการเตรียมพล">การลาเข้ารับการตรวจเลือกหรือเข้ารับการเตรียมพล</MenuItem>
                 <MenuItem value="การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน">การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน</MenuItem>
-                <MenuItem value="การลาเข้ารับการตรวจเลือกหรือเข้ารับการเตรียมพล">การลาติดตามคู่สมรส</MenuItem>
-                <MenuItem value="การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน">การลาไปศึกษา ฝึกอบรม ปฏิบัติการวิจัย หรือดูงาน</MenuItem>
+                <MenuItem value="การลาติดตามคู่สมรส">การลาติดตามคู่สมรส</MenuItem>
+                <MenuItem value="การลาไปฟื้นฟูสมรรถภาพด้านอาชีพ">การลาไปฟื้นฟูสมรรถภาพด้านอาชีพ</MenuItem>
     </TextField>
   </Grid>
 
@@ -353,6 +354,9 @@ const LeaveSystem = () => {
       fullWidth
       InputLabelProps={{ shrink: true }}
     />
+        <Typography variant="caption" color="primary">
+          * แสดง เดือน/วัน/ปี
+        </Typography>
   </Grid>
 
   <Grid item xs={12} sm={6}>
@@ -370,6 +374,9 @@ const LeaveSystem = () => {
       fullWidth
       InputLabelProps={{ shrink: true }}
     />
+          <Typography variant="caption" color="primary">
+          * แสดง เดือน/วัน/ปี
+        </Typography>
   </Grid>
 
   <Grid item xs={12} sm={6}>

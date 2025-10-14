@@ -12,7 +12,8 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  Pagination, // ✅ เพิ่ม import Pagination
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Avatar from "@mui/material/Avatar";
@@ -34,6 +35,10 @@ const UserManagement = () => {
   });
   const [editId, setEditId] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+
+    // ✅ state สำหรับ pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 6; // จำนวนแถวต่อหน้า
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -79,6 +84,15 @@ const UserManagement = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+    // ✅ จัดการ Pagination
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+  const currentRows = users.slice(indexOfFirstRow, indexOfLastRow);
+
+  const handlePageChange = (event, page) => {
+    setCurrentPage(page);
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -215,7 +229,7 @@ const UserManagement = () => {
        sx={{ width: 70, height: 70, marginRight: 2 }} 
       alt="Logo"/>
         <Typography variant="h5" component="div" sx={{ fontWeight: "bold" }}>
-          ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราชภัฏศรัทธาธรรม
+          ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราษฎร์ศรัทธาธรรม
         </Typography>
       </Grid>
       <h2 className="header">จัดการข้อมูลสมาชิก</h2>
@@ -264,7 +278,7 @@ const UserManagement = () => {
               <TableCell>จัดการ</TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          {/* <TableBody>
             {users.map((user) => (
               <TableRow key={user.tec_id}>
                 <TableCell>{user.tec_id}</TableCell>
@@ -291,9 +305,57 @@ const UserManagement = () => {
                 </TableCell>
               </TableRow>
             ))}
+          </TableBody> */}
+
+                    <TableBody>
+            {currentRows.map((user) => (
+              <TableRow key={user.tec_id}>
+                <TableCell>{user.tec_id}</TableCell>
+                <TableCell>{user.tec_name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
+                <TableCell>{user.position}</TableCell>
+                <TableCell>
+                  <img
+                    src={`${process.env.REACT_APP_API_URL}/image/${user.t_profile}`}
+                    alt="Profile"
+                    width="50"
+                    height="50"
+                    style={{ borderRadius: "50%", objectFit: "cover" }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleEdit(user)}
+                  >
+                    แก้ไข
+                  </Button>{" "}
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleDelete(user.tec_id)}
+                  >
+                    ลบ
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
+
         </Table>
       </TableContainer>
+
+            {/* ✅ Pagination */}
+      <Pagination
+        count={Math.ceil(users.length / rowsPerPage)}
+        page={currentPage}
+        onChange={handlePageChange}
+        color="primary"
+        sx={{ mt: 2, display: "flex", justifyContent: "center" }}
+      />
+
       <Button
         variant="contained"
         color="error"

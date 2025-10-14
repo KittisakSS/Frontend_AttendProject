@@ -169,9 +169,10 @@ const TableLeaveDirect = () => {
           <TextField
             label="ชื่อ"
             name="tec_name"
-            value={filters.tec_name}
-            onChange={handleFilterChange}
+            variant="outlined"
             size="small"
+            onChange={handleFilterChange}
+            value={filters.tec_name}
           />
           <TextField
             type="date"
@@ -206,6 +207,7 @@ const TableLeaveDirect = () => {
             sx={{ width: 100 }} // หรือกำหนดค่าความกว้างเอง
           >
             <MenuItem value="">ทั้งหมด</MenuItem>
+            <MenuItem value="ลาราชการ">ลาราชการ</MenuItem>
             <MenuItem value="ลาป่วย">ลาป่วย</MenuItem>
             <MenuItem value="ลากิจ">ลากิจ</MenuItem>
             <MenuItem value="ลาคลอด">ลาคลอด</MenuItem>

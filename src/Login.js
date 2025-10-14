@@ -125,7 +125,7 @@ export default function SignIn() {
         >
           <Avatar src={logo} sx={{ width: 100, height: 100, marginRight: 2 }} alt="Logo"/>
           <Typography variant="h5" component="div" sx={{ fontWeight: 'bold' }}>
-            ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราชภัฏศรัทธาธรรม
+            ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราษฎร์ศรัทธาธรรม
           </Typography>
         </Grid>
         {/* Form Section */}

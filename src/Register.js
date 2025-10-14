@@ -150,7 +150,7 @@ export default function SignUp() {
             alt="Logo"
           />
           <Typography variant="h5" component="div" sx={{ fontWeight: "bold" }}>
-            ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราชภัฏศรัทธาธรรม
+            ระบบลงเวลาปฏิบัติงานราชการโรงเรียนวัดราษฎร์ศรัทธาธรรม
           </Typography>
         </Grid>
         <CssBaseline />
@@ -260,9 +260,9 @@ export default function SignUp() {
                     value={formData.role}
                     onChange={handleChange}
                   >
-                    <MenuItem value="admin">Admin</MenuItem>
-                    <MenuItem value="user">User</MenuItem>
-                    <MenuItem value="director">Director</MenuItem>
+                    <MenuItem value="admin">แอดมิน</MenuItem>
+                    <MenuItem value="user">ครูทั่วไป</MenuItem>
+                    <MenuItem value="director">ผู้อำนวยการ</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>

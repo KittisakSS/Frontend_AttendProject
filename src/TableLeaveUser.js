@@ -150,6 +150,7 @@ const TableLeaveUser = () => {
                       sx={{ width: 100 }} // หรือกำหนดค่าความกว้างเอง
                     >
                       <MenuItem value="">ทั้งหมด</MenuItem>
+                      <MenuItem value="ลาราชการ">ลาราชการ</MenuItem>
                       <MenuItem value="ลาป่วย">ลาป่วย</MenuItem>
                       <MenuItem value="ลากิจ">ลากิจ</MenuItem>
                       <MenuItem value="ลาคลอด">ลาคลอด</MenuItem>
